@@ -19,7 +19,7 @@ Page.prototype = {
         window.addEventListener("ViewChanged", function(event) {
             me._width = event.width;
             me._height = event.height;
-            me.setView(event.view);
+            me.setView(event.view, event.detail);
         }, false);
     },
 
@@ -44,12 +44,13 @@ Page.prototype = {
         return "#" + id;
     },
 
-    setView: function(view) {
+    setView: function(view, detail) {
         if (this._view) {
             $(this._getViewElement()).hide();
         }
 
         this._view = view;
+        this._viewDetail = detail;
 
         if (this._view) {
 
@@ -81,6 +82,10 @@ Page.prototype = {
 
     getActive: function() {
         return this._active;
+    },
+
+    isOnScreen: function() {
+        return this._active && this._viewDetail != OpenChannel.ViewDetail.OFFSCREEN;
     },
 };
 
@@ -118,12 +123,16 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         var me = this;
         window.addEventListener("MoveToPreviousItem", function() {
             twitter.previousTweet();
-            me._updateView();
+            if (me.isOnScreen()) {
+                me._updateView();
+            }
         }, false);
 
         window.addEventListener("MoveToNextItem", function() {
             twitter.nextTweet();
-            me._updateView();
+            if (me.isOnScreen()) {
+                me._updateView();
+            }
         }, false);
 
         $(document).bind('refreshed', function() {
@@ -131,10 +140,10 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         });
     },
 
-    setView: function(view) {
-        Page.prototype.setView.call(this, view);
+    setView: function(view, detail) {
+        Page.prototype.setView.call(this, view, detail);
 
-        if (this._active) {
+        if (this.isOnScreen()) {
             this._updateView();
         }
     },
