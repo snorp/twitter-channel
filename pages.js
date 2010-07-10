@@ -153,17 +153,24 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         }
     },
 
-    _createTweetbox: function(tweet) {
-        var box = document.createElement('div');
-        $(box).addClass('tweetbox');
+    _getTweetbox: function() {
+        var view = this._getViewElement();
+        if ($(view).find(".tweetbox").size() == 0) {
+            var box = document.createElement('div');
+            $(box).addClass('tweetbox');
+            $(view).append(box);
+        }
+
+        return $(view).find(".tweetbox");
+    },
+
+    _renderTweet: function(tweet) {
 
         var html = '<div class="tweet_text autofontsize"><strong>' + tweet.user.screen_name + '</strong> ' +
             tweet.text + '</div><div class="tweet_footer autofontsize"><span class="message">' +
             prettyDate(tweet.created_at) + ' via ' + tweet.source + '</span></div>';
 
-        $(box).html(html);
-
-        return box;
+        this._getTweetbox().html(html);
     },
 
     _fadeInCurrentTweet: function() {
@@ -173,11 +180,13 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         if (!tweet)
            return;
 
-        var box = this._createTweetbox(tweet);
-        $(view).append(box);
-        $(box).find(".autofontsize").autoFontSize();
-        $(box).hide();
-        $(box).fadeIn();
+        this._renderTweet(tweet);
+
+        $(view).find(".autofontsize").autoFontSize();
+
+        var box = this._getTweetbox();
+        box.children().hide();
+        box.children().fadeIn();
     },
 
     _updateView: function() {
@@ -186,15 +195,14 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         $(view).width(this._width);
         $(view).height(this._height);
 
-        var oldbox = $(view).find('.tweetbox');
-        if (oldbox.size() == 0) {
+        var box = $(view).find('.tweetbox');
+        if (box.size() == 0) {
             this._fadeInCurrentTweet();
             return;
         }
 
         var me = this;
-        oldbox.fadeOut('slow', function() {
-            oldbox.remove();
+        box.children().fadeOut('slow', function() {
             me._fadeInCurrentTweet();
         });
     },
