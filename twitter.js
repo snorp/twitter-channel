@@ -13,6 +13,8 @@ const TIMELINE_URL = "http://api.twitter.com/1/statuses/home_timeline.json";
 const MENTIONS_URL = "http://api.twitter.com/1/statuses/mentions.json";
 const VERIFY_CREDS_URL = "http://api.twitter.com/1/account/verify_credentials.json";
 const RATE_LIMIT_URL = "http://api.twitter.com/1/account/rate_limit_status.json";
+const REFRESH_INTERVAL = (1000 * 60 * 15); // 15 minutes
+const MAX_TWEETS = 20;
 
 const MAX_DUMP_DEPTH = 10;
 
@@ -55,7 +57,12 @@ Twitter.prototype = {
     _init: function() {
         this._index = 0;
         this._restore();
+
         this._mergeTweets();
+
+        if (this.isAuthenticated()) {
+            this._startRefreshTimeout();
+        }
     },
 
     isAuthenticated: function() {
@@ -156,14 +163,14 @@ Twitter.prototype = {
 
             error: function(xhr, textStatus, errorThrown) {
                 console.log("TWITTER: failed to complete auth");
-                $(document).trigger('auth-invalid');
+                me._notifyAuthInvalid();
             }
         });
     },
 
     _signedAjax: function(args) {
         if (!this.isAuthenticated()) {
-            $(document).trigger('auth-invalid');
+            this._notifyAuthInvalid();
             return;
         }
 
@@ -191,6 +198,7 @@ Twitter.prototype = {
         console.log("TWITTER: " + authorizationHeader);
         console.log("TWITTER: requesting: " + message.action);
 
+        var me = this;
         $.ajax({
             type: message.method,
             url: message.action,
@@ -207,7 +215,7 @@ Twitter.prototype = {
                 console.log("TWITTER: signed response: " + xhr.responseText);
 
                 if (xhr.status == 401) {
-                    $(document).trigger('auth-invalid');
+                    me._notifyAuthInvalid();
                 }
             },
 
@@ -220,7 +228,7 @@ Twitter.prototype = {
             error: function(xhr, textStatus, errorThrown) {
                 console.log("TWITTER: error code: " + xhr.status);
                 if (xhr.status == 401) {
-                    $(document).trigger('auth-invalid');
+                    me._notifyAuthInvalid();
                 }
 
                 if (args.error) {
@@ -274,9 +282,37 @@ Twitter.prototype = {
             return b.id - a.id;
         });
 
+        this._tweets = this._tweets.splice(0, MAX_TWEETS);
+
         this._adjustIndex();
 
         $(document).trigger('refreshed');
+    },
+
+    _stopRefreshTimeout: function() {
+        if (this._refreshTimeoutId) {
+            window.clearInterval(this._refreshTimeoutId);
+            delete this._refreshTimeoutId;
+        }
+    },
+
+    _startRefreshTimeout: function() {
+        if (!this._refreshTimeoutId) {
+            var me = this;
+            this._refreshTimeoutId = window.setInterval(function() {
+                me.refresh();
+            }, REFRESH_INTERVAL);
+        }
+    },
+
+    _notifyAuthValid: function() {
+        this._startRefreshTimeout();
+        $(document).trigger('auth-valid');
+    },
+
+    _notifyAuthInvalid: function() {
+        this._stopRefreshTimeout();
+        $(document).trigger('auth-invalid');
     },
 
     _refreshTweetList: function(url, prop) {
@@ -322,12 +358,12 @@ Twitter.prototype = {
             success: function(data, textStatus, xhr) {
                 console.log("TWITTER: wtf! " + xhr.responseText);
                 console.log("TWITTER: auth valid for : " + data.screen_name);
-                $(document).trigger('auth-valid');
+                me._notifyAuthValid();
             },
 
             error: function(xhr, textStatus, errorThrown) {
                 console.log("TWITTER: fetch error on: " + this.url);
-                $(document).trigger('auth-invalid');
+                me._notifyAuthInvalid();
             },
         });
     },
