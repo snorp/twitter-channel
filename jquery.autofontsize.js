@@ -1,5 +1,4 @@
 jQuery.fn.autoFontSize = function() {
-    console.log("SNORP: autofontsizing " + this.size());
     this.each(function(i, element) {
         if ($(element).innerHeight() == 0) {
             // element has not been shown yet!
@@ -36,7 +35,7 @@ jQuery.fn.autoFontSize = function() {
 
         var end = new Date().getTime();
 
-        console.log("SNORP: font sizing took: " + (end - start));
+        console.log("TWITTER: font sizing took: " + (end - start));
 
         $(element).css({ fontSize: fontSize });
     });

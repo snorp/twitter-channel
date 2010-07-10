@@ -1,4 +1,8 @@
 
+var userPattern = /@([a-zA-Z0-9]+) /g;
+var hashPattern = /\#([a-zA-Z0-9]+)/g;
+var linkPattern = /https?:\/\/.* /g;
+
 /* base class for other pages */
 function Page() {
     this._init();
@@ -164,10 +168,40 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         return $(view).find(".tweetbox");
     },
 
-    _renderTweet: function(tweet) {
+    _linkifyScreenName: function(screenName) {
+        return '<a href="http://twitter.com/' + screenName + '">' + screenName + '</a>';
+    },
 
-        var html = '<div class="tweet_text autofontsize"><strong>' + tweet.user.screen_name + '</strong> ' +
-            tweet.text + '</div><div class="tweet_footer autofontsize"><span class="message">' +
+    _linkifyUrls: function(text){
+        text = text.replace(
+            /((https?\:\/\/)|(www\.))(\S+)(\w{2,4})(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/gi,
+            function(url){
+                var full_url = url;
+                if (!full_url.match('^https?:\/\/')) {
+                    full_url = 'http://' + full_url;
+                }
+                return '<a target="_blank" href="' + full_url + '">' + url + '</a>';
+            });
+        return text;
+    },
+
+    _linkifyText: function(text) {
+        var html = this._linkifyUrls(text);
+        html = html.replace(userPattern, "<a href='http://twitter.com/$1' target='_blank'>@$1</a> ");
+        html = html.replace(hashPattern, "<a href='http://twitter.com/search?q=%23$1' target='_blank'>#$1</a>");
+        return html;
+    },
+
+    _renderTweet: function(tweet) {
+        var screenName = tweet.user.screen_name;
+        var text = tweet.text;
+        if (this._view == OpenChannel.View.FOCUS) {
+            text = this._linkifyText(tweet.text);
+            screenName = this._linkifyScreenName(screenName);
+        }
+
+        var html = '<div class="tweet_text autofontsize"><strong>' + screenName + '</strong> ' +
+            text + '</div><div class="tweet_footer autofontsize"><span class="message">' +
             prettyDate(tweet.created_at) + ' via ' + tweet.source + '</span></div>';
 
         this._getTweetbox().html(html);
