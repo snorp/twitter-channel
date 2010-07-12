@@ -40,7 +40,6 @@ Page.prototype = {
             $(document.body).append('<div id="' + id + '" class="view-container"></div>');
         }
 
-
         return "#" + id;
     },
 
@@ -138,6 +137,14 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         $(document).bind('refreshed', function() {
             me._updateItemCount();
         });
+
+        $("#status").keyup(function() {
+            me._updateCharCount();
+        });
+
+        $("#status-update-button").click(function() {
+            me._postTweet();
+        });
     },
 
     setView: function(view, detail) {
@@ -177,6 +184,35 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         return $(view).find(".tweetbox");
     },
 
+    _setPostStatus: function(text) {
+        $("#post-status").html(text);
+    },
+
+    _postTweet: function() {
+        var text = $("#status").val();
+        if (text.length == 0)
+            return;
+
+        this._setPostStatus("Sending your tweet...");
+
+        var me = this;
+        twitter.updateStatus({
+            status: text,
+
+            success: function() {
+                me._setPostStatus("");
+                $("#status").val("");
+            },
+
+            error: function(xhr) {
+                console.log("TWITTER: failed to tweet: " + xhr.status);
+                me._setPostStatus("Unable to post your tweet!");
+            },
+
+        });
+
+    },
+
     _linkifyScreenName: function(screenName) {
         return '<a href="http://twitter.com/' + screenName + '">' + screenName + '</a>';
     },
@@ -201,19 +237,24 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         return html;
     },
 
-    _renderTweet: function(tweet) {
-        var screenName = tweet.user.screen_name;
-        var text = tweet.text;
-        if (this._view == OpenChannel.View.FOCUS) {
-            text = this._linkifyText(tweet.text);
+    _renderTweet: function(args) {
+        var screenName = args.tweet.user.screen_name;
+        var text = args.tweet.text;
+
+        if (args.linkify) {
+            text = this._linkifyText(text);
             screenName = this._linkifyScreenName(screenName);
         }
 
-        var html = '<div class="tweet_text autofontsize"><strong>' + screenName + '</strong> ' +
-            text + '</div><div class="tweet_footer autofontsize"><span class="message">' +
-            prettyDate(tweet.created_at) + ' via ' + tweet.source + '</span></div>';
+        var html = '<div class="tweet-text autofontsize"><strong>' + screenName + '</strong> ' +
+            text + '</div><div class="tweet-footer autofontsize"><span class="message">' +
+            prettyDate(args.tweet.created_at) + ' via ' + args.tweet.source + '</span></div>';
 
-        this._getTweetbox().html(html);
+        if (args.showAvatar) {
+            html = '<img class="tweetlist-avatar" src="' + args.tweet.user.profile_image_url + '"></img>' + html;
+        }
+
+        $(args.box).html(html);
     },
 
     _fadeInCurrentTweet: function() {
@@ -223,7 +264,11 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         if (!tweet)
            return;
 
-        this._renderTweet(tweet);
+        this._renderTweet({
+           box: this._getTweetbox(),
+           tweet: tweet,
+           linkify: (this._view == OpenChannel.View.FOCUS)
+        });
 
         $(view).find(".autofontsize").autoFontSize();
 
@@ -232,21 +277,59 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         box.children().fadeIn();
     },
 
+    _updateTweetList: function() {
+        $("#twitter-focus-tweetlist").html("");
+
+        var me = this;
+        $.each(twitter.getTweets(), function(i, tweet) {
+            var box = document.createElement('div');
+            $(box).addClass('tweetlist-item');
+            me._renderTweet({
+                box: box,
+                tweet: tweet,
+                linkify: true,
+                showAvatar: true,
+            });
+
+            $("#twitter-focus-tweetlist").append(box);
+        });
+    },
+
+    _updateCharCount: function() {
+        var charCount = 160 - parseInt($("#status").val().length);
+        if (charCount < 20) {
+            $("#charcount").addClass("warning");
+        } else {
+            $("#charcount").removeClass("warning");
+        }
+
+        $("#charcount").html(charCount);
+    },
+
     _updateView: function() {
         var view = this._getViewElement();
 
         $(view).width(this._width);
         $(view).height(this._height);
 
-        var box = $(view).find('.tweetbox');
-        if (box.size() == 0) {
-            this._fadeInCurrentTweet();
-            return;
-        }
+        if (this._view == OpenChannel.View.CARD ||
+            this._view == OpenChannel.View.CHANNEL) {
 
-        var me = this;
-        box.children().fadeOut('slow', function() {
-            me._fadeInCurrentTweet();
-        });
+            var box = $(view).find('.tweetbox');
+            if (box.size() == 0) {
+                this._fadeInCurrentTweet();
+                return;
+            }
+
+            var me = this;
+            box.children().fadeOut('slow', function() {
+                if (view == me._getViewElement()) {
+                    me._fadeInCurrentTweet();
+                }
+            });
+        } else {
+            this._updateCharCount();
+            this._updateTweetList();
+        }
     },
 });

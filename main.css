@@ -17,6 +17,10 @@ a:hover {
     text-decoration: underline;
 }
 
+textarea {
+    resize: none;
+}
+
 .message {
     color: gray;
 }
@@ -62,12 +66,74 @@ a:hover {
 }
 
 
-.tweet_text {
+.tweet-text {
     height: 80%;
     overflow: hidden;
 }
 
-.tweet_footer {
+.tweet-footer {
     height: 20%;
     overflow: hidden;
+}
+
+#twitter-focus-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    margin-left: 25%;
+    margin-right: 25%;
+    padding: 24px;
+    /* height: 100%; */
+
+    background-color: white;
+    -webkit-border-radius: 12px;
+    -webkit-box-shadow: 3px 3px 3px #666;
+}
+
+#status-update-content {
+    width: 66%;
+    font-size: 25px;
+}
+
+#status-update-content textarea {
+    width: 100%;
+}
+
+#post-status {
+    width: 100%;
+}
+
+#status-update-button {
+    float: right;
+}
+
+#charcount {
+    float: right;
+}
+
+#charcount.warning {
+    color: red;
+}
+
+.tweetlist {
+    clear: right;
+    margin-top: 2em;
+    overflow-y: auto;
+    font-size: 25px;
+    height: 75%;
+}
+
+.tweetlist-item {
+    padding: 6px;
+    border-bottom: 1px solid black;
+    margin: 0px;
+}
+
+.tweetlist-avatar {
+    float: left;
+    margin-right: 12px;
 }

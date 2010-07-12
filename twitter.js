@@ -9,10 +9,14 @@ var accessor = {
     }
 };
 
+const REALM = "Twitter API";
+
 const TIMELINE_URL = "http://api.twitter.com/1/statuses/home_timeline.json";
 const MENTIONS_URL = "http://api.twitter.com/1/statuses/mentions.json";
 const VERIFY_CREDS_URL = "http://api.twitter.com/1/account/verify_credentials.json";
 const RATE_LIMIT_URL = "http://api.twitter.com/1/account/rate_limit_status.json";
+const STATUS_UPDATE_URL = "http://api.twitter.com/1/statuses/update.json";
+
 const REFRESH_INTERVAL = (1000 * 60 * 15); // 15 minutes
 const MAX_TWEETS = 20;
 
@@ -87,7 +91,7 @@ Twitter.prototype = {
         };
 
         OAuth.completeRequest(message, accessor);
-        var authorizationHeader = OAuth.getAuthorizationHeader("", message.parameters);
+        var authorizationHeader = OAuth.getAuthorizationHeader(REALM, message.parameters);
 
         console.log("TWITTER: starting auth");
 
@@ -136,7 +140,7 @@ Twitter.prototype = {
             tokenSecret: this._requestTokenSecret
         });
 
-        authorizationHeader = OAuth.getAuthorizationHeader("", message.parameters);
+        authorizationHeader = OAuth.getAuthorizationHeader(REALM, message.parameters);
 
         var me = this;
         $.ajax({
@@ -184,7 +188,8 @@ Twitter.prototype = {
         if (message.method == "GET") {
             message.action = OAuth.addToURL(message.action, args.parameters);
         } else {
-            data = args.parameters;
+            message.parameters = args.parameters;
+            data = OAuth.formEncode(args.parameters);
         }
 
         OAuth.completeRequest(message, {
@@ -194,7 +199,7 @@ Twitter.prototype = {
             tokenSecret: this._accessTokenSecret
         });
 
-        var authorizationHeader = OAuth.getAuthorizationHeader("", message.parameters);
+        var authorizationHeader = OAuth.getAuthorizationHeader(REALM, message.parameters);
         console.log("TWITTER: " + authorizationHeader);
         console.log("TWITTER: requesting: " + message.action);
 
@@ -405,6 +410,33 @@ Twitter.prototype = {
         this._index = this._index - 1;
         this._adjustIndex();
         return this.getCurrentTweet();
+    },
+
+    updateStatus: function(args) {
+
+        var data = {
+            status: args.status,
+        };
+
+        if (args.reply_to) {
+            data.in_reply_to_status_id = args.reply_to.id;
+        }
+
+        var me = this;
+        this._signedAjax({
+            method: 'POST',
+            url: STATUS_UPDATE_URL,
+
+            parameters: data,
+
+            success: function(data, textStatus, xhr) {
+                args.success(data);
+            },
+
+            error: function(xhr, textStatus, errorThrown) {
+                args.error(xhr);
+            },
+        });
     },
 };
 
