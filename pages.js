@@ -292,6 +292,10 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             var box = document.createElement('div');
             $(box).addClass('tweetlist-item');
             $(box).attr('id', 'tweetlist-item-' + tweet.id);
+            $(box).hover(function() {
+                twitter.seekTweet(tweet);
+            }, function() {});
+
             me._renderTweet({
                 box: box,
                 tweet: tweet,
@@ -308,6 +312,8 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             var offset = $("#twitter-focus-tweetlist").position().top;
             $("#twitter-focus-tweetlist").scrollTop(position - offset);
         }
+
+        $("#twitter-focus-tweetlist").find("a").attr('target', '_blank');
     },
 
     _updateCharCount: function() {

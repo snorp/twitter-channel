@@ -432,6 +432,15 @@ Twitter.prototype = {
         return this.getCurrentTweet();
     },
 
+    seekTweet: function(tweet) {
+        var me = this;
+        $.each(this._tweets, function(i, t) {
+            if (tweet.id == t.id) {
+                me._index = i;
+            }
+        });
+    },
+
     updateStatus: function(args) {
 
         var data = {

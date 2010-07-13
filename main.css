@@ -130,6 +130,13 @@ textarea {
     padding: 6px;
     border-bottom: 1px solid gray;
     margin: 6px;
+    background-color: white;
+    -webkit-transition: background-color 0.3s linear;
+}
+
+.tweetlist-item:hover {
+    background-color: #eeeeee;
+    -webkit-transition: background-color 0.3s linear;
 }
 
 .tweetlist-avatar {
