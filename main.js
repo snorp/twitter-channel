@@ -56,11 +56,8 @@ $(document).ready(function() {
 
     $(document).bind('auth-valid', function() {
         console.log("TWITTER: auth is now valid");
-        if (twitter.getTweets().length > 0) {
-            activatePage(pages.twitter);
-        } else {
-            twitter.refresh();
-        }
+        activatePage(pages.twitter);
+        twitter.refresh();
     });
 
     $(document).bind('refreshed', function() {
