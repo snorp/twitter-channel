@@ -60,13 +60,20 @@ function Twitter() {
 Twitter.prototype = {
     _init: function() {
         this._index = 0;
+        this._tweets = [];
+
         this._restore();
 
-        this._mergeTweets();
-
-        if (this.isAuthenticated()) {
-            this._startRefreshTimeout();
-        }
+        var me = this;
+        window.addEventListener("PropertyChanged", function(event) {
+            var name = event.name;
+            var value = event.value;
+            if (name == 'account.accessToken') {
+                me._accessToken = value;
+            } else if (name == 'account.accessTokenSecret') {
+                me._accessTokenSecret = value;
+            }
+        }, false);
     },
 
     isAuthenticated: function() {
@@ -252,13 +259,19 @@ Twitter.prototype = {
         }
 
         localStorage.setItem("cachedData", JSON.stringify(data));
+
+        if (this._accessToken && this._accessTokenSecret) {
+            openchannel.setProperties({
+                'account.accessToken': this._accessToken,
+                'account.accessTokenSecret': this._accessTokenSecret
+            });
+        }
     },
 
     _restore: function() {
         var jsonData = localStorage.getItem("cachedData");
         if (jsonData) {
             var data = JSON.parse(jsonData);
-
             for (var prop in data) {
                 this[prop] = data[prop];
             }
@@ -281,7 +294,15 @@ Twitter.prototype = {
         if (!this._timeline)
             this._timeline = [];
 
-        this._tweets = this._timeline.concat(this._mentions);
+        var tweetHash = {};
+        $.each(this._timeline.concat(this._mentions), function(i, tweet) {
+            tweetHash[tweet.id] = tweet;
+        });
+
+        this._tweets = [];
+        for (var id in tweetHash) {
+            this._tweets.push(tweetHash[id]);
+        }
 
         this._tweets.sort(function(a, b) {
             return b.id - a.id;
@@ -361,7 +382,6 @@ Twitter.prototype = {
             url: VERIFY_CREDS_URL,
 
             success: function(data, textStatus, xhr) {
-                console.log("TWITTER: wtf! " + xhr.responseText);
                 console.log("TWITTER: auth valid for : " + data.screen_name);
                 me._notifyAuthValid();
             },
