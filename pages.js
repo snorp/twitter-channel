@@ -304,8 +304,9 @@ $.extend(TwitterPage.prototype, Page.prototype, {
 
         var current = twitter.getCurrentTweet();
         if (current) {
-            var currentId = "#tweetlist-item-" + current.id;
-            $("#twitter-focus-tweetlist").scrollTop($(currentId).position().top - $(currentId).outerHeight());
+            var position = $("#tweetlist-item-" + current.id).position().top;
+            var offset = $("#twitter-focus-tweetlist").position().top;
+            $("#twitter-focus-tweetlist").scrollTop(position - offset);
         }
     },
 
