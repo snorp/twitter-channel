@@ -19,7 +19,7 @@ Page.prototype = {
         window.addEventListener("ViewChanged", function(event) {
             me._width = event.width;
             me._height = event.height;
-            me.setView(event.view, event.detail);
+            me.setView(event.view, event.details);
         }, false);
     },
 
@@ -214,7 +214,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
     },
 
     _linkifyScreenName: function(screenName) {
-        return '<a href="http://twitter.com/' + screenName + '">' + screenName + '</a>';
+        return '<a target="_blank" href="http://twitter.com/' + screenName + '">' + screenName + '</a>';
     },
 
     _linkifyUrls: function(text){
@@ -238,6 +238,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
     },
 
     _renderTweet: function(args) {
+
         var screenName = args.tweet.user.screen_name;
         var text = args.tweet.text;
 
@@ -246,15 +247,21 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             screenName = this._linkifyScreenName(screenName);
         }
 
-        var html = '<div class="tweet-text autofontsize"><strong>' + screenName + '</strong> ' +
-            text + '</div><div class="tweet-footer autofontsize"><span class="message">' +
-            prettyDate(args.tweet.created_at) + ' via ' + args.tweet.source + '</span></div>';
+        var t = $.template('<div class="tweet-text autofontsize"><strong>${screenName}</strong> ${text}</div><div class="tweet-footer autofontsize"><span class="message">${createdAt} via ${source}</span></div>');
+
+        $(args.box).html(t, {
+            screenName: screenName,
+            text: text,
+            createdAt: prettyDate(args.tweet.created_at),
+            source: args.tweet.source
+        });
 
         if (args.showAvatar) {
-            html = '<img class="tweetlist-avatar" src="' + args.tweet.user.profile_image_url + '"></img>' + html;
+            t = $.template('<div class="tweetlist-avatar"><img src="${url}"></img></div>');
+            $(args.box).prepend(t, {
+                url: args.tweet.user.profile_image_url
+            });
         }
-
-        $(args.box).html(html);
     },
 
     _fadeInCurrentTweet: function() {

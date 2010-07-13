@@ -129,11 +129,11 @@ textarea {
 
 .tweetlist-item {
     padding: 6px;
-    border-bottom: 1px solid black;
-    margin: 0px;
+    border-bottom: 1px solid gray;
+    margin: 6px;
 }
 
 .tweetlist-avatar {
-    float: left;
     margin-right: 12px;
+    float: left;
 }

@@ -29,6 +29,15 @@ $(document).ready(function() {
     pages.login = new LoginPage();
     pages.twitter = new TwitterPage();
 
+    $(window).bind('Initialized', function() {
+        if (twitter.isAuthenticated()) {
+            twitter.verifyCredentials();
+        } else {
+            activatePage(pages.login);
+        }
+    });
+
+
     $(document).bind('auth-started', function() {
         console.log("TWITTER: auth was started");
     });
@@ -47,7 +56,11 @@ $(document).ready(function() {
 
     $(document).bind('auth-valid', function() {
         console.log("TWITTER: auth is now valid");
-        twitter.refresh();
+        if (twitter.getTweets().length > 0) {
+            activatePage(pages.twitter);
+        } else {
+            twitter.refresh();
+        }
     });
 
     $(document).bind('refreshed', function() {
@@ -63,11 +76,5 @@ $(document).ready(function() {
 
     openchannel.setTitle(CHANNEL_TITLE);
     openchannel.setFaviconUrl(CHANNEL_FAVICON);
-
-    if (twitter.isAuthenticated()) {
-        twitter.verifyCredentials();
-    } else {
-        activatePage(pages.login);
-    }
 });
 
