@@ -247,14 +247,21 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             screenName = this._linkifyScreenName(screenName);
         }
 
-        var t = $.template('<div class="tweet-text autofontsize"><strong>${screenName}</strong> ${text}</div><div class="tweet-footer autofontsize"><span class="message">${createdAt} via ${source}</span></div>');
+        var t = $.template('<div class="tweet-text autofontsize"><strong>${screenName}</strong> ${text}</div><div class="tweet-footer autofontsize"><span class="message">${createdAt} via ${source} <a class="tweet-reply" href="${replyUrl}">in reply to ${replyUser}</a></span></div>');
 
         $(args.box).html(t, {
             screenName: screenName,
             text: text,
             createdAt: prettyDate(args.tweet.created_at),
-            source: args.tweet.source
+            source: args.tweet.source,
+            replyUrl: "http://twitter.com/" + args.tweet.in_reply_to_screen_name +
+                "/status/" + args.tweet.in_reply_to_status_id,
+            replyUser: args.tweet.in_reply_to_screen_name,
         });
+
+        if (!args.tweet.in_reply_to_screen_name) {
+            $(args.box).find(".tweet-reply").hide();
+        }
 
         if (args.showAvatar) {
             t = $.template('<div class="tweetlist-avatar"><img src="${url}"></img></div>');
