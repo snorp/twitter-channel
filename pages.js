@@ -1,5 +1,5 @@
 
-var userPattern = /@([a-zA-Z0-9]+) /g;
+var userPattern = /@([a-zA-Z0-9]+)(:? )/g;
 var hashPattern = /\#([a-zA-Z0-9]+)/g;
 var linkPattern = /https?:\/\/.* /g;
 
@@ -232,7 +232,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
 
     _linkifyText: function(text) {
         var html = this._linkifyUrls(text);
-        html = html.replace(userPattern, "<a href='http://twitter.com/$1' target='_blank'>@$1</a> ");
+        html = html.replace(userPattern, "<a href='http://twitter.com/$1' target='_blank'>@$1</a>$2");
         html = html.replace(hashPattern, "<a href='http://twitter.com/search?q=%23$1' target='_blank'>#$1</a>");
         return html;
     },
@@ -291,6 +291,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         $.each(twitter.getTweets(), function(i, tweet) {
             var box = document.createElement('div');
             $(box).addClass('tweetlist-item');
+            $(box).attr('id', 'tweetlist-item-' + tweet.id);
             me._renderTweet({
                 box: box,
                 tweet: tweet,
@@ -300,6 +301,12 @@ $.extend(TwitterPage.prototype, Page.prototype, {
 
             $("#twitter-focus-tweetlist").append(box);
         });
+
+        var current = twitter.getCurrentTweet();
+        if (current) {
+            var currentId = "#tweetlist-item-" + current.id;
+            $("#twitter-focus-tweetlist").scrollTop($(currentId).position().top - $(currentId).outerHeight());
+        }
     },
 
     _updateCharCount: function() {

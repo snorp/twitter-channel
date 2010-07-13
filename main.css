@@ -121,7 +121,6 @@ textarea {
 
 .tweetlist {
     clear: right;
-    margin-top: 2em;
     overflow-y: auto;
     font-size: 25px;
     height: 75%;
