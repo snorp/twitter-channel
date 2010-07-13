@@ -25,6 +25,10 @@ textarea {
     color: gray;
 }
 
+.message a {
+    color: gray;
+}
+
 .view-container {
     display: none;
     position: absolute;
