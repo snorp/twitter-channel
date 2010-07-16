@@ -26,14 +26,14 @@ function activatePage(page) {
 }
 
 $(document).ready(function() {
-    pages.login = new LoginPage();
+    pages.signin = new SigninPage();
     pages.twitter = new TwitterPage();
 
     $(window).bind('Initialized', function() {
         if (twitter.isAuthenticated()) {
             twitter.verifyCredentials();
         } else {
-            activatePage(pages.login);
+            activatePage(pages.signin);
         }
     });
 
@@ -51,7 +51,7 @@ $(document).ready(function() {
     $(document).bind('auth-invalid', function() {
         console.log("TWITTER: auth is not valid!");
         twitter.clearAuth();
-        activatePage(pages.login);
+        activatePage(pages.signin);
     });
 
     $(document).bind('auth-valid', function() {

@@ -1,0 +1,13 @@
+{
+  "name": "litl Channel Simulator",
+  "version": "1.0",
+  "description": "Provides an environment for testing litl HTML channels",
+  "permissions": [
+    "tabs", "http://*/*", "https://*/*", "file://*/*"
+  ],
+  "background_page": "extension.html",
+  "browser_action": {
+    "default_icon": "favicon.ico",
+    "default_title": "litl Channels"
+  }
+}

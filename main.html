@@ -2,8 +2,13 @@
 <html>
 <head>
     <link rel="stylesheet" href="main.css" type="text/css" media="screen" title="no title" charset="utf-8">
-    <script src="litl://content/api/v2/jquery-1.4.2.min.js"></script>
+    <script src="jquery-1.4.2.min.js"></script>
+    
     <script type="text/javascript" src="litl://content/api/v2/openchannel.js"></script>
+    
+    <!-- this is only useful when running in a chrome extension -->
+    <script type="text/javascript" src="http://snorp.net/fakeopenchannel.js"></script>
+    
     <script src="sha1.js"></script>
     <script src="oauth.js"></script>
     <script src="pretty.js"></script>
@@ -15,20 +20,27 @@
 </head>
 <body>
 
-    <div id="login-card" class="view-container">
-        Signin with Twitter&trade;!
+    <div id="signin-card" class="view-container">
+        Signin with Twitter
     </div>
-    <div id="login-channel" class="view-container">
-        Flip me mover to login to Twitter&trade;
+    <div id="signin-channel" class="view-container">
+        Flip me mover to signin to Twitter
     </div>
-    <div id="login-focus" class="view-container">
-        <div id="login-content">
-            <a id="login-link" href="#">Click here</a> to sign into
-            Twitter&trade;!<br />
-
-            When complete, enter your authentication code here:
-            <form id="login_pin_form">
-                <input id="login_pin" type="text"></input>
+    <div id="signin-focus" class="view-container">
+        <div id="signin-content">
+            <p>If you have a Twitter account, sign in below.  If you need to sign up for an account, <a target="_blank" href="http://twitter.com/signup">click here</a>.</p>
+            
+            <form id="signin_form">
+                <p class="signinbox">
+                    <label for="username">Username or email</label>
+                    <input id="username" type="text" />
+                </p>
+                <p class="signinbox">
+                    <label for="password">Password</label>
+                    <input id="password" type="password" />
+                </p>
+                <input type="submit" id="signin-submit" value="Sign in" />
+                <span id="signin-error"></span>
             </form>
         </div>
     </div>

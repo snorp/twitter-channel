@@ -52,7 +52,7 @@ textarea {
     -webkit-box-shadow: 3px 3px 3px #666;
 }
 
-#login-content {
+#signin-content {
     position: absolute;
     top: 0;
     right: 0;
@@ -60,7 +60,6 @@ textarea {
     bottom: 0;
 
     font-size: 22px;
-    text-align: center;
 
     margin: 25%;
     padding: 24px;
@@ -69,6 +68,61 @@ textarea {
     -webkit-box-shadow: 3px 3px 3px #666;
 }
 
+#signin-content label {
+    display: block;
+}
+
+.signinbox input {
+    background: white;
+    border: 2px solid #DDD;
+    border-bottom-left-radius: 4px 4px;
+    border-bottom-right-radius: 4px 4px;
+    border-top-left-radius: 4px 4px;
+    border-top-right-radius: 4px 4px;
+    display: block;
+    font: normal normal normal 22px/normal 'CorpoS';
+    margin: 0px 0px 8px;
+    padding: 5px;
+    width: 218px;
+}
+
+textarea {
+    background: white;
+    border: 2px solid #DDD;
+    border-bottom-left-radius: 4px 4px;
+    border-bottom-right-radius: 4px 4px;
+    border-top-left-radius: 4px 4px;
+    border-top-right-radius: 4px 4px;
+    display: block;
+    font: normal normal normal 22px/normal 'CorpoS';
+    margin: 0px 0px 8px;
+    padding: 5px;
+}
+
+#signin-submit {
+    background: #39D url('bg-btn-blue.png') repeat-x scroll 0px 0px;
+    border: solid #39D;
+    -webkit-border-radius: 4px;
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0px 5px 0px 0px;
+    padding: 4px 10px 5px;
+    text-shadow: #39D 0px -1px 0px;
+}
+
+#signin-error {
+    display: none;
+    float: right;
+    background-color: red;
+    color: white;
+    -webkit-border-radius: 4px;
+    padding: 4px;
+}
+
+#signin-submit:hover {
+    cursor: pointer;
+}
 
 .tweet-text {
     height: 80%;
@@ -146,4 +200,19 @@ textarea {
 .tweetlist-avatar {
     margin-right: 12px;
     float: left;
+}
+
+.tweetlist-avatar img {
+    width: 50px;
+    height: 50px;
+}
+
+.tweet-controls {
+    opacity: 0.0;
+    float: right;
+}
+
+.tweet-controls.active {
+    opacity: 1.0;
+    -webkit-transition: opacity 0.3s linear;
 }

@@ -291,7 +291,7 @@ OAuth.setProperties(OAuth, // utility functions
         for (var p = 0; p < list.length; ++p) {
             var parameter = list[p];
             var name = parameter[0];
-            if (name.indexOf("oauth_") == 0) {
+            if (name.indexOf("oauth_") == 0 || name.indexOf("x_auth") == 0) {
                 header += ',' + OAuth.percentEncode(name) + '="' + OAuth.percentEncode(parameter[1]) + '"';
             }
         }

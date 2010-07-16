@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <script>
+    
+    chrome.browserAction.onClicked.addListener(function(tab) {
+        var file = "main.html";
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", chrome.extension.getURL('channel.json'), false);
+        xhr.send(null);
+        var channelJson = xhr.responseText;           
+        if (channelJson) {
+            file = JSON.parse(channelJson).entryPoint.file;
+        }
+        
+        chrome.windows.create({
+            width: 1280,
+            height: 800,
+            url: chrome.extension.getURL(file)
+        });
+    });
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

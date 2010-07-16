@@ -5,7 +5,7 @@ var accessor = {
         signatureMethod     : "HMAC-SHA1",
         requestTokenURL     : "http://api.twitter.com/oauth/request_token",
         userAuthorizationURL: "http://api.twitter.com/oauth/authorize",
-        accessTokenURL      : "http://api.twitter.com/oauth/access_token"
+        accessTokenURL      : "https://api.twitter.com/oauth/access_token"
     }
 };
 
@@ -132,6 +132,7 @@ Twitter.prototype = {
         });
     },
 
+    /* This is the old OAuth implementation
     completeAuth: function(pin) {
 
         var message = {
@@ -157,6 +158,49 @@ Twitter.prototype = {
             beforeSend: function(xhr) {
                 xhr.setRequestHeader("Authorization", authorizationHeader);
             },
+
+            success: function(data, textStatus, xhr) {
+                var results = OAuth.decodeForm(data);
+
+                me._accessToken = OAuth.getParameter(results, "oauth_token");
+                me._accessTokenSecret = OAuth.getParameter(results, "oauth_token_secret");
+                me._userId = OAuth.getParameter(results, "user_id");
+                me._screenName = OAuth.getParameter(results, "screen_name");
+                me._save();
+
+                console.log("TWITTER: auth successful for user: " + me._screenName);
+
+                $(document).trigger('auth-completed');
+            },
+
+            error: function(xhr, textStatus, errorThrown) {
+                console.log("TWITTER: failed to complete auth");
+                me._notifyAuthInvalid();
+            }
+        });
+    },
+    */
+    
+    completeAuth: function(username, password) {
+
+        var message = {
+            method: "POST",
+            action: accessor.serviceProvider.accessTokenURL,
+            parameters: [['x_auth_username', username], ['x_auth_password', password],
+                         ['x_auth_mode', 'client_auth']],
+        };
+
+        OAuth.completeRequest(message, {
+            consumerKey: accessor.consumerKey,
+            consumerSecret: accessor.consumerSecret,
+        });
+
+        var me = this;
+        $.ajax({
+            type: message.method,
+            url: message.action,
+            
+            data: OAuth.formEncode(message.parameters),
 
             success: function(data, textStatus, xhr) {
                 var results = OAuth.decodeForm(data);

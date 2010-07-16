@@ -1,6 +1,6 @@
 
-var userPattern = /@([a-zA-Z0-9]+)(:? )/g;
-var hashPattern = /\#([a-zA-Z0-9]+)/g;
+var userPattern = /(@)([a-zA-Z0-9]+)(:? )/g;
+var hashPattern = /(\#)([a-zA-Z0-9]+)/g;
 var linkPattern = /https?:\/\/.* /g;
 
 /* base class for other pages */
@@ -88,24 +88,31 @@ Page.prototype = {
     },
 };
 
-function LoginPage() {
+function SigninPage() {
     this._init();
 }
 
-$.extend(LoginPage.prototype, Page.prototype, {
+$.extend(SigninPage.prototype, Page.prototype, {
     _init: function() {
         Page.prototype._init.call(this);
-        this._tag = 'login';
+        this._tag = 'signin';
 
-        $("#login-link").click(function(e) {
+        $("#signin_form").submit(function(e) {
             e.preventDefault();
-            twitter.startAuth();
-        });
-
-        $("#login_pin_form").submit(function(e) {
-            e.preventDefault();
-            twitter.completeAuth($("#login_pin").val());
+            twitter.completeAuth($("#username").val(),
+                                 $("#password").val());
             return false;
+        });
+        
+        $(document).bind('auth-invalid', function() {
+            if ($("#username").val() != "") {
+                $("#signin-error").text("Wrong username or password");
+                $("#signin-error").show();
+            }
+        });
+        
+        $(document).bind('auth-valid', function() {
+            $("#signin-error").hide();
         });
     },
 });
@@ -232,8 +239,8 @@ $.extend(TwitterPage.prototype, Page.prototype, {
 
     _linkifyText: function(text) {
         var html = this._linkifyUrls(text);
-        html = html.replace(userPattern, "<a href='http://twitter.com/$1' target='_blank'>@$1</a>$2");
-        html = html.replace(hashPattern, "<a href='http://twitter.com/search?q=%23$1' target='_blank'>#$1</a>");
+        html = html.replace(userPattern, "$1<a href='http://twitter.com/$2' target='_blank'>$2</a>$3");
+        html = html.replace(hashPattern, "$1<a href='http://twitter.com/search?q=%23$2' target='_blank'>$2</a>");
         return html;
     },
 
@@ -247,7 +254,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             screenName = this._linkifyScreenName(screenName);
         }
 
-        var t = $.template('<div class="tweet-text autofontsize"><strong>${screenName}</strong> ${text}</div><div class="tweet-footer autofontsize"><span class="message">${createdAt} via ${source} <a class="tweet-reply" href="${replyUrl}">in reply to ${replyUser}</a></span></div>');
+        var t = $.template('<div class="tweet-text autofontsize"><strong>${screenName}</strong> ${text}</div><div class="tweet-footer autofontsize"><span class="message">${createdAt} via ${source} <a class="tweet-reply" href="${replyUrl}">in reply to ${replyUser}</a></span><span class="tweet-controls"></span></div>');
 
         $(args.box).html(t, {
             screenName: screenName,
@@ -261,6 +268,10 @@ $.extend(TwitterPage.prototype, Page.prototype, {
 
         if (!args.tweet.in_reply_to_screen_name) {
             $(args.box).find(".tweet-reply").hide();
+        }
+        
+        if (args.showControls) {
+            $(args.box).find(".tweet-controls").html('<a class="reply-button" href="#">reply</a> <a class="retweet-button" href="#">retweet</a>');
         }
 
         if (args.showAvatar) {
@@ -300,14 +311,32 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             $(box).addClass('tweetlist-item');
             $(box).attr('id', 'tweetlist-item-' + tweet.id);
             $(box).hover(function() {
+                $(box).find('.tweet-controls').addClass('active');
                 twitter.seekTweet(tweet);
-            }, function() {});
-
+            }, function() {
+                $(box).find('.tweet-controls').removeClass('active');
+            });
+            
             me._renderTweet({
                 box: box,
                 tweet: tweet,
                 linkify: true,
                 showAvatar: true,
+                showControls: true,
+            });
+            
+            $(box).find(".reply-button").click(function(e) {
+                e.preventDefault();
+                $("#status").val("@" + tweet.user.screen_name + " " + $("#status").val());
+                $("#status").focus();
+                
+                var screenNameLen = tweet.user.screen_name.length + 2;
+                $("#status").get(0).setSelectionRange(screenNameLen, screenNameLen);
+            });
+            
+            $(box).find(".retweet-button").click(function(e) {
+                e.preventDefault();
+                twitter.retweet(tweet);
             });
 
             $("#twitter-focus-tweetlist").append(box);
