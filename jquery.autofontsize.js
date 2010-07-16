@@ -35,7 +35,7 @@ jQuery.fn.autoFontSize = function() {
 
         var end = new Date().getTime();
 
-        console.log("TWITTER: font sizing took: " + (end - start));
+        //console.log("TWITTER: font sizing took: " + (end - start));
 
         $(element).css({ fontSize: fontSize });
     });

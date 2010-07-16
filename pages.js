@@ -1,7 +1,10 @@
 
+
 var userPattern = /(@)([a-zA-Z0-9]+)(:? )/g;
 var hashPattern = /(\#)([a-zA-Z0-9]+)/g;
 var linkPattern = /https?:\/\/.* /g;
+
+var flickrPattern = /http:\/\/flic\.kr\/p\/([a-zA-Z0-9]+)/g;
 
 /* base class for other pages */
 function Page() {
@@ -205,12 +208,17 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         var text = $("#status").val();
         if (text.length == 0)
             return;
+            
+        if (this._replyTweet && text.indexOf("@" + this._replyTweet.user.screen_name) != 0) {
+            delete this._replyTweet;
+        }
 
         this._setPostStatus("Sending your tweet...");
 
         var me = this;
         twitter.updateStatus({
             status: text,
+            replyTo: me._replyTweet,
 
             success: function() {
                 me._setPostStatus("");
@@ -251,28 +259,59 @@ $.extend(TwitterPage.prototype, Page.prototype, {
     },
 
     _renderTweet: function(args) {
+        
+        var parentScreenName = null;
+        var tweet = args.tweet;
 
-        var screenName = args.tweet.user.screen_name;
-        var text = args.tweet.text;
+        if (tweet.retweeted_status) {
+            tweet = tweet.retweeted_status;
+            parentScreenName = args.tweet.user.screen_name;
+        }
+
+        var screenName = tweet.user.screen_name;
+        var text = tweet.text;
 
         if (args.linkify) {
             text = this._linkifyText(text);
             screenName = this._linkifyScreenName(screenName);
+            
+            if (parentScreenName) {
+                parentScreenName = this._linkifyScreenName(parentScreenName);
+            }
         }
 
-        var t = $.template('<div class="tweet-text autofontsize"><strong>${screenName}</strong> ${text}</div><div class="tweet-footer autofontsize"><span class="message">${createdAt} via ${source} <a class="tweet-reply" href="${replyUrl}">in reply to ${replyUser}</a></span><span class="tweet-controls"></span></div>');
+        var t = $.template('\
+        <div class="tweet-text autofontsize"> \
+            <strong>${screenName}</strong> ${text} \
+            <div class="tweet-photos"></div> \
+        </div> \
+        <div class="tweet-footer autofontsize"> \
+            <span class="message">${createdAt} via ${source} \
+                <a class="tweet-reply" href="${replyUrl}"> \
+                    in reply to ${replyUser}</a> \
+            </span> \
+            <span class="retweet-message">(retweeted by ${retweetedBy})</span> \
+            <span class="tweet-controls"></span> \
+        </div>');
 
         $(args.box).html(t, {
             screenName: screenName,
             text: text,
-            createdAt: prettyDate(args.tweet.created_at),
-            source: args.tweet.source,
-            replyUrl: "http://twitter.com/" + args.tweet.in_reply_to_screen_name +
-                "/status/" + args.tweet.in_reply_to_status_id,
-            replyUser: args.tweet.in_reply_to_screen_name,
+            createdAt: prettyDate(tweet.created_at),
+            source: tweet.source,
+            replyUrl: "http://twitter.com/" + tweet.in_reply_to_screen_name +
+                "/status/" + tweet.in_reply_to_status_id,
+            replyUser: tweet.in_reply_to_screen_name,
+            retweetedBy: parentScreenName ? parentScreenName : "",
         });
+        
+        if (parentScreenName) {
+            $(args.box).find('.retweet-message').show();
+        } else {
+            $(args.box).find('.retweet-message').hide();
+        }
 
-        if (!args.tweet.in_reply_to_screen_name) {
+        if (!tweet.in_reply_to_screen_name) {
             $(args.box).find(".tweet-reply").hide();
         }
         
@@ -283,8 +322,27 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         if (args.showAvatar) {
             t = $.template('<div class="tweetlist-avatar"><img src="${url}"></img></div>');
             $(args.box).prepend(t, {
-                url: args.tweet.user.profile_image_url
+                url: tweet.user.profile_image_url
             });
+        }
+        
+        var me = this;
+        if (args.showPhotos) {
+            var matches = tweet.text.match(flickrPattern);
+            if (matches && matches.length > 0) {
+                for (var i = 0; i < matches.length; i++) {
+                    var match = matflickrPattern.exec(matches[i]);
+                
+                    flickr.getSizes(base58_decode(match[1]), function(data) {
+                        var size = data.sizes.size[0];
+                        if (me._view == OpenChannel.View.CHANNEL) {
+                            size = data.sizes.size[2];
+                        }
+                    
+                        $(args.box).find('.tweet-photos').append('<a target="_blank" href="' + match[0] + '"><img src="' + size.source + '"></img></a>');
+                    });
+                }
+            }
         }
     },
 
@@ -298,6 +356,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         this._renderTweet({
            box: this._getTweetbox(),
            tweet: tweet,
+           showPhotos: (this._view == OpenChannel.View.CHANNEL),
            linkify: (this._view == OpenChannel.View.FOCUS)
         });
 
@@ -329,6 +388,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
                 linkify: true,
                 showAvatar: true,
                 showControls: true,
+                showPhotos: true,
             });
             
             $(box).find(".reply-button").click(function(e) {
@@ -338,6 +398,8 @@ $.extend(TwitterPage.prototype, Page.prototype, {
                 
                 var screenNameLen = tweet.user.screen_name.length + 2;
                 $("#status").get(0).setSelectionRange(screenNameLen, screenNameLen);
+                
+                me._replyTweet = tweet;
             });
             
             $(box).find(".retweet-button").click(function(e) {

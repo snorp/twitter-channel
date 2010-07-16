@@ -491,8 +491,8 @@ Twitter.prototype = {
             status: args.status,
         };
 
-        if (args.reply_to) {
-            data.in_reply_to_status_id = args.reply_to.id;
+        if (args.replyTo) {
+            data.in_reply_to_status_id = args.replyTo.id;
         }
 
         var me = this;

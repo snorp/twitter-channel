@@ -21,6 +21,7 @@ textarea {
     resize: none;
 }
 
+.retweet-message
 .message {
     color: gray;
 }
@@ -28,6 +29,8 @@ textarea {
 .message a {
     color: gray;
 }
+
+
 
 .view-container {
     display: none;
@@ -191,7 +194,7 @@ textarea {
 
 .tweetlist-item {
     padding: 6px;
-    border-bottom: 1px solid gray;
+    border-bottom: 1px solid #eee;
     margin: 6px;
     background-color: white;
     -webkit-transition: background-color 0.3s linear;
@@ -215,6 +218,15 @@ textarea {
 .tweet-controls {
     opacity: 0.0;
     float: right;
+}
+
+.tweet-controls a {
+    margin-left: 12px;
+}
+
+.tweet-photos img {
+    display: inline;
+    padding: 4px;
 }
 
 .tweet-controls.active {
