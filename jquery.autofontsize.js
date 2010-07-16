@@ -1,5 +1,5 @@
 jQuery.fn.autoFontSize = function() {
-    this.each(function(i, element) {
+    this.each(function(i, element) {        
         if ($(element).innerHeight() == 0) {
             // element has not been shown yet!
             return;

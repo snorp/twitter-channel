@@ -281,18 +281,23 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         }
 
         var t = $.template('\
-        <div class="tweet-text autofontsize"> \
-            <strong>${screenName}</strong> ${text} \
-            <div class="tweet-photos"></div> \
-        </div> \
-        <div class="tweet-footer autofontsize"> \
-            <span class="message">${createdAt} via ${source} \
-                <a class="tweet-reply" href="${replyUrl}"> \
-                    in reply to ${replyUser}</a> \
-            </span> \
-            <span class="retweet-message">(retweeted by ${retweetedBy})</span> \
-            <span class="tweet-controls"></span> \
-        </div>');
+            <div class="tweet-body"> \
+                <div class="tweet-text autofontsize"> \
+                    <strong>${screenName}</strong> ${text} \
+                    <div class="tweet-photos"></div> \
+                </div> \
+                <div class="tweet-footer autofontsize"> \
+                    <span class="message">${createdAt} via ${source} \
+                        <a class="tweet-reply" href="${replyUrl}"> \
+                            in reply to ${replyUser}</a> \
+                    </span> \
+                    <span class="retweet-message">(retweeted by ${retweetedBy})</span> \
+                    <span class="tweet-controls"> \
+                        <a class="reply-button" href="#">reply</a> \
+                        <a class="retweet-button" href="#">retweet</a> \
+                    </span> \
+                </div> \
+            </div>');
 
         $(args.box).html(t, {
             screenName: screenName,
@@ -314,13 +319,9 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         if (!tweet.in_reply_to_screen_name) {
             $(args.box).find(".tweet-reply").hide();
         }
-        
-        if (args.showControls) {
-            $(args.box).find(".tweet-controls").html('<a class="reply-button" href="#">reply</a> <a class="retweet-button" href="#">retweet</a>');
-        }
 
-        if (args.showAvatar) {
-            t = $.template('<div class="tweetlist-avatar"><img src="${url}"></img></div>');
+        if (args.showAvatars) {
+            t = $.template('<div class="tweet-avatar"><img src="${url}"></img></div>');
             $(args.box).prepend(t, {
                 url: tweet.user.profile_image_url
             });
@@ -353,16 +354,17 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         if (!tweet)
            return;
 
+        var box = this._getTweetbox();
+
         this._renderTweet({
-           box: this._getTweetbox(),
+           box: box,
            tweet: tweet,
            showPhotos: (this._view == OpenChannel.View.CHANNEL),
            linkify: (this._view == OpenChannel.View.FOCUS)
         });
 
-        $(view).find(".autofontsize").autoFontSize();
+        $(box).find(".autofontsize").autoFontSize();
 
-        var box = this._getTweetbox();
         box.children().hide();
         box.children().fadeIn();
     },
@@ -386,7 +388,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
                 box: box,
                 tweet: tweet,
                 linkify: true,
-                showAvatar: true,
+                showAvatars: true,
                 showControls: true,
                 showPhotos: true,
             });
