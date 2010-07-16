@@ -124,6 +124,11 @@ textarea {
     cursor: pointer;
 }
 
+.signin-message {
+    display: block;
+    padding: 20%;
+}
+
 .tweet-text {
     height: 80%;
     overflow: hidden;

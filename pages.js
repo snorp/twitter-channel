@@ -115,6 +115,12 @@ $.extend(SigninPage.prototype, Page.prototype, {
             $("#signin-error").hide();
         });
     },
+    
+    setView: function(view, detail) {
+        Page.prototype.setView.call(this, view, detail);
+        
+        $(this._getViewElement()).autoFontSize();
+    }
 });
 
 function TwitterPage() {
