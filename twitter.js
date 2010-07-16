@@ -16,6 +16,7 @@ const MENTIONS_URL = "http://api.twitter.com/1/statuses/mentions.json";
 const VERIFY_CREDS_URL = "http://api.twitter.com/1/account/verify_credentials.json";
 const RATE_LIMIT_URL = "http://api.twitter.com/1/account/rate_limit_status.json";
 const STATUS_UPDATE_URL = "http://api.twitter.com/1/statuses/update.json";
+const RETWEET_URL = "http://api.twitter.com/1/statuses/retweet/";
 
 const REFRESH_INTERVAL = (1000 * 60 * 15); // 15 minutes
 const MAX_TWEETS = 20;
@@ -486,7 +487,6 @@ Twitter.prototype = {
     },
 
     updateStatus: function(args) {
-
         var data = {
             status: args.status,
         };
@@ -504,6 +504,8 @@ Twitter.prototype = {
 
             success: function(data, textStatus, xhr) {
                 args.success(data);
+                me._tweets.unshift(data);
+                $(document).trigger('refreshed');
             },
 
             error: function(xhr, textStatus, errorThrown) {
@@ -511,6 +513,24 @@ Twitter.prototype = {
             },
         });
     },
+    
+    retweet: function(args) {        
+        var me = this;
+        this._signedAjax({
+            method: 'POST',
+            url: RETWEET_URL + args.tweet.id + ".json",
+
+            success: function(data, textStatus, xhr) {
+                args.success(data);
+                me._tweets.unshift(data);
+                $(document).trigger('refreshed');
+            },
+
+            error: function(xhr, textStatus, errorThrown) {
+                args.error(xhr);
+            },
+        });
+    }
 };
 
 var twitter = new Twitter();

@@ -202,6 +202,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
 
     _setPostStatus: function(text) {
         $("#post-status").html(text);
+        $("#post-status").autoFontSize();
     },
 
     _postTweet: function() {
@@ -220,7 +221,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             status: text,
             replyTo: me._replyTweet,
 
-            success: function() {
+            success: function(data) {
                 me._setPostStatus("");
                 $("#status").val("");
             },
@@ -325,6 +326,8 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             $(args.box).prepend(t, {
                 url: tweet.user.profile_image_url
             });
+            
+            $(args.box).find('.tweet-body').css('marginLeft', '62px');
         }
         
         var me = this;
@@ -406,7 +409,16 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             
             $(box).find(".retweet-button").click(function(e) {
                 e.preventDefault();
-                twitter.retweet(tweet);
+                twitter.retweet({
+                    tweet: tweet,
+                    
+                    success: function(newtweet) {
+                    },
+                    
+                    error: function() {
+                        me._setPostStatus("Failed to retweet, try again in a moment.");
+                    }
+                });
             });
 
             $("#twitter-focus-tweetlist").append(box);
