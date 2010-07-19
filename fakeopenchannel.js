@@ -76,6 +76,7 @@ SimulatedOpenChannel.prototype = {
                      'left': '0',
                      'bottom': '0',
                      'z-order': '10',
+                     'opacity': '0.5',
                      'backgroundColor': 'yellow' });
         return border;
     },
