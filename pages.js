@@ -347,7 +347,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             for (var i = 0; i < urls.length; i++) {
                 var url = urls[i];
                 
-                if (url.indexOf('yfrog.com') > 0) {
+                if (url.indexOf('http://yfrog.') >= 0) {
                     me._appendTweetPhoto(args.box, url, url + ".th.jpg");
                 } else if (url.indexOf('flic.kr') > 0) {
                     var match = flickrPattern.exec(matches[i]);
