@@ -59,6 +59,8 @@ function Twitter() {
 }
 
 Twitter.prototype = {
+    MAX_CHARS: 140,
+    
     _init: function() {
         this._index = 0;
         this._tweets = [];

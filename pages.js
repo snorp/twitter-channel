@@ -1,5 +1,4 @@
 
-
 var userPattern = /(@)([a-zA-Z0-9]+)(:? )/g;
 var hashPattern = /(\#)([a-zA-Z0-9]+)/g;
 var linkPattern = /https?:\/\/.* /g;
@@ -435,7 +434,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
     },
 
     _updateCharCount: function() {
-        var charCount = 160 - parseInt($("#status").val().length);
+        var charCount = twitter.MAX_CHARS - parseInt($("#status").val().length);
         if (charCount < 20) {
             $("#charcount").addClass("warning");
         } else {
