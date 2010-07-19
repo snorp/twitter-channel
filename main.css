@@ -37,6 +37,20 @@ textarea {
     top: 0px;
 }
 
+.popup {
+    position: fixed;
+    left: 0;
+    top: 0;
+    background-color: white;
+    max-width: 40em;
+    max-height: 1em;
+    padding: 6px;
+    border: 2px solid #C0DEED;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-border-radius: 6px;
+}
+
 .tweetbox {
     height: auto;
 
@@ -160,6 +174,7 @@ textarea {
 
 #status-update-content {
     width: 50%;
+    height: 25%;
     font-size: 25px;
 }
 

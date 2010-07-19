@@ -184,7 +184,7 @@ Twitter.prototype = {
     },
     */
     
-    completeAuth: function(username, password) {
+    completeAuth: function(username, password, callback) {
 
         var message = {
             method: "POST",
@@ -216,11 +216,17 @@ Twitter.prototype = {
 
                 console.log("TWITTER: auth successful for user: " + me._screenName);
 
+                if (callback) {
+                    callback(true, xhr);
+                }
+                
                 $(document).trigger('auth-completed');
             },
 
             error: function(xhr, textStatus, errorThrown) {
-                console.log("TWITTER: failed to complete auth");
+                if (callback) {
+                    callback(false, xhr);
+                }
                 me._notifyAuthInvalid();
             }
         });
@@ -333,6 +339,13 @@ Twitter.prototype = {
             this._index = (this._tweets.length - 1);
         }
     },
+    
+    _expandUrls: function() {
+        for (var i = 0; i < this._tweets.length; i++) {
+            var urls = findUrls(this._tweets[i].text);
+            bitly.expand(urls);
+        }
+    },
 
     _mergeTweets: function() {
         if (!this._mentions)
@@ -356,7 +369,8 @@ Twitter.prototype = {
         });
 
         this._tweets = this._tweets.splice(0, MAX_TWEETS);
-
+        
+        this._expandUrls();
         this._adjustIndex();
 
         $(document).trigger('refreshed');

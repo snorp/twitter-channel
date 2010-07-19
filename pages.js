@@ -101,7 +101,17 @@ $.extend(SigninPage.prototype, Page.prototype, {
         $("#signin_form").submit(function(e) {
             e.preventDefault();
             twitter.completeAuth($("#username").val(),
-                                 $("#password").val());
+                                 $("#password").val(),
+                                 function(success, xhr) {
+                                     if (success)
+                                        return;
+
+                                     if (xhr.status == 401) {
+                                         $("#signin-error").text("Wrong username or password");
+                                     } else {
+                                         $("#signin-error").text("Twitter seems to be having a problem");
+                                     }
+                                 });
             return false;
         });
         
@@ -368,6 +378,21 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         box.children().hide();
         box.children().fadeIn();
     },
+    
+    _popup: function(target, content) {
+        var offset = $(target).offset();
+        
+        var popup = document.createElement('div');
+        $(popup).addClass('popup');
+        $(popup).css({
+            left: offset.left,
+            top: offset.top - $(target).height() - 6,
+        });
+        
+        $(popup).append(content);        
+        $(document.body).append(popup);
+        return popup;
+    },
 
     _updateTweetList: function() {
         $("#twitter-focus-tweetlist").html("");
@@ -416,6 +441,18 @@ $.extend(TwitterPage.prototype, Page.prototype, {
                         me._setPostStatus("Failed to retweet, try again in a moment.");
                     }
                 });
+            });
+            
+            $(box).find("a").hover(function() {
+                var longUrl = bitly.getExpandedUrl(this.href);
+                if (longUrl) {
+                    this._popupElement = me._popup(this, longUrl);
+                }
+            }, function() {
+                if (this._popupElement) {
+                    $(this._popupElement).remove();
+                    delete this._popupElement;
+                }
             });
 
             $("#twitter-focus-tweetlist").append(box);
