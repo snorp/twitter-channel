@@ -334,7 +334,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             var matches = tweet.text.match(flickrPattern);
             if (matches && matches.length > 0) {
                 for (var i = 0; i < matches.length; i++) {
-                    var match = matflickrPattern.exec(matches[i]);
+                    var match = flickrPattern.exec(matches[i]);
                 
                     flickr.getSizes(base58_decode(match[1]), function(data) {
                         var size = data.sizes.size[0];
