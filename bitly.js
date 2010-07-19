@@ -1,5 +1,5 @@
-const BITLY_LOGIN = "snorp";
-const BITLY_API_KEY = "R_0c6bfcf1034687b05cec3a4bf3a400ec";
+const BITLY_LOGIN = "litlbirdie";
+const BITLY_API_KEY = "R_e88159067d133e566a117a4cf4555dd5";
 
 const BITLY_SHORTEN_URL = "http://api.bit.ly/v3/shorten";
 
