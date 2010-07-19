@@ -265,6 +265,10 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         html = html.replace(hashPattern, "$1<a href='http://twitter.com/search?q=%23$2' target='_blank'>$2</a>");
         return html;
     },
+    
+    _appendTweetPhoto: function(box, imageUrl, thumbUrl) {
+        $(box).find('.tweet-photos').append('<a target="_blank" href="' + imageUrl + '"><img src="' + thumbUrl + '"></img></a>');
+    },
 
     _renderTweet: function(args) {
         
@@ -338,10 +342,14 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         }
         
         var me = this;
-        if (args.showPhotos) {
-            var matches = tweet.text.match(flickrPattern);
-            if (matches && matches.length > 0) {
-                for (var i = 0; i < matches.length; i++) {
+        if (args.showPhotos) {            
+            var urls = findUrls(tweet.text);
+            for (var i = 0; i < urls.length; i++) {
+                var url = urls[i];
+                
+                if (url.indexOf('yfrog.com') > 0) {
+                    me._appendTweetPhoto(args.box, url, url + ".th.jpg");
+                } else if (url.indexOf('flic.kr') > 0) {
                     var match = flickrPattern.exec(matches[i]);
                 
                     flickr.getSizes(base58_decode(match[1]), function(data) {
@@ -350,7 +358,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
                             size = data.sizes.size[2];
                         }
                     
-                        $(args.box).find('.tweet-photos').append('<a target="_blank" href="' + match[0] + '"><img src="' + size.source + '"></img></a>');
+                        me._appendTweetPhoto(args.box, match[0], size.source);
                     });
                 }
             }
