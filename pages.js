@@ -1,7 +1,6 @@
 
 var userPattern = /(@)([a-zA-Z0-9]+)(:? )/g;
 var hashPattern = /(\#)([a-zA-Z0-9]+)/g;
-var linkPattern = /https?:\/\/.* /g;
 
 var flickrPattern = /http:\/\/flic\.kr\/p\/([a-zA-Z0-9]+)/g;
 
@@ -155,6 +154,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
 
         $("#status").keyup(function() {
             me._updateCharCount();
+            me._shortenUrls();
         });
 
         $("#status-update-button").click(function() {
@@ -239,15 +239,13 @@ $.extend(TwitterPage.prototype, Page.prototype, {
     },
 
     _linkifyUrls: function(text){
-        text = text.replace(
-            /((https?\:\/\/)|(www\.))(\S+)(\w{2,4})(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/gi,
-            function(url){
-                var full_url = url;
-                if (!full_url.match('^https?:\/\/')) {
-                    full_url = 'http://' + full_url;
-                }
-                return '<a target="_blank" href="' + full_url + '">' + url + '</a>';
-            });
+        var urls = findUrls(text);
+        for (var i = 0; i < urls.length; i++) {
+            var url = urls[i];
+            
+            text = text.replace(urls[i], '<a target="_blank" href="' + url + '">' + url + '</a>');
+        }
+
         return text;
     },
 
@@ -442,6 +440,26 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         }
 
         $("#charcount").html(charCount);
+    },
+    
+    _shortenUrls: function() {
+        var urls = findUrls($("#status").val());
+        
+        for (var i = 0; i < urls.length; i++) {
+            var url = urls[i];
+                        
+            // ugh
+            if (url.indexOf("bit.ly") >= 0 || url.length < 25)
+                continue;
+
+            bitly.shorten(url, function(shortUrl) {
+                if (shortUrl) {
+                    var text = $("#status").val();
+                    text = text.replace(url, shortUrl);
+                    $("#status").val(text);
+                }
+            });
+        }
     },
 
     _updateView: function() {
