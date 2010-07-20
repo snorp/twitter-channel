@@ -213,7 +213,6 @@ textarea:focus {
 #post-status {
     display: inline-block;
     overflow: hidden;
-    height: 1em;
     width: 74%;
     margin-top: 4px;
     font-style: italic;

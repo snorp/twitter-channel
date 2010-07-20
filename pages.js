@@ -216,7 +216,6 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         }
         
         $("#post-status").html(text);
-        $("#post-status").autoFontSize();
         $("#post-status").stop().animate({ 'opacity': '1.0' }, 'slow');
     },
 
