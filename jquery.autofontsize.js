@@ -4,6 +4,13 @@ jQuery.fn.autoFontSize = function() {
             // element has not been shown yet!
             return;
         }
+        
+        if (!$(element).data('defaultFontSize')) {
+            $(element).data('defaultFontSize', $(element).css('font-size'));
+        } else {
+            // reset to default first
+            $(element).css('font-size', $(element).data('defaultFontSize'));
+        }
 
         if ($(element).height() > 500) {
             var fontSize = 125;
@@ -17,6 +24,8 @@ jQuery.fn.autoFontSize = function() {
                 position: 'absolute',
                 top: 0,
                 left: 0,
+                margin: 0,
+                padding: 0,
                 visibility: 'hidden',
                 height: 'auto'
             });
@@ -31,7 +40,7 @@ jQuery.fn.autoFontSize = function() {
             $("#ruler").css({ fontSize: fontSize });
         } while ($("#ruler").height() > $(element).innerHeight());
 
-        $(document.body).remove("#ruler");
+        $("#ruler").remove();
 
         var end = new Date().getTime();
 
@@ -39,5 +48,7 @@ jQuery.fn.autoFontSize = function() {
 
         $(element).css({ fontSize: fontSize });
     });
+    
+    return this;
 };
 

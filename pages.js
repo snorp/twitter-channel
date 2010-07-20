@@ -479,12 +479,12 @@ $.extend(TwitterPage.prototype, Page.prototype, {
     _updateCharCount: function() {
         var charCount = twitter.MAX_CHARS - parseInt($("#status").val().length);
         if (charCount < 20) {
-            $("#charcount").addClass("warning");
+            $("#status-charcount").addClass("warning");
         } else {
-            $("#charcount").removeClass("warning");
+            $("#status-charcount").removeClass("warning");
         }
 
-        $("#charcount").html(charCount);
+        $("#status-charcount").html(charCount);
     },
     
     _shortenUrls: function() {

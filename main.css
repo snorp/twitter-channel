@@ -17,8 +17,29 @@ a:hover {
     text-decoration: underline;
 }
 
+.textarea-container {
+    display: block;
+    background: white;
+    border: 2px solid #DDD;
+    border-bottom-left-radius: 4px 4px;
+    border-bottom-right-radius: 4px 4px;
+    border-top-left-radius: 4px 4px;
+    border-top-right-radius: 4px 4px;
+    padding: 5px;
+}
+
 textarea {
     resize: none;
+    font: normal normal normal 22px/normal 'CorpoS';
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    outline: none;
+}
+
+textarea:focus {
+    outline: none;
 }
 
 .retweet-message,
@@ -101,20 +122,28 @@ textarea {
     width: 218px;
 }
 
-textarea {
-    background: white;
-    border: 2px solid #DDD;
-    border-bottom-left-radius: 4px 4px;
-    border-bottom-right-radius: 4px 4px;
-    border-top-left-radius: 4px 4px;
-    border-top-right-radius: 4px 4px;
-    display: block;
-    font: normal normal normal 22px/normal 'CorpoS';
-    margin: 0px 0px 8px;
-    padding: 5px;
+.twitter-button,
+.twitter-button-large {
+    background: #39D url('bg-btn-blue.png') repeat-x scroll 0px 0px;
+    border: solid #39D;
+    -webkit-border-radius: 4px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 4px 5px 5px;
+    margin: 0px;
+    text-shadow: #39D 0px -1px 0px;
 }
 
-#signin-submit {
+.twitter-button:hover, .twitter-button-large:hover {
+    cursor: pointer;
+}
+
+.twitter-button-large {
+    font-size: 22px;
+}
+
+.twitter-button-large {
     background: #39D url('bg-btn-blue.png') repeat-x scroll 0px 0px;
     border: solid #39D;
     -webkit-border-radius: 4px;
@@ -173,33 +202,56 @@ textarea {
 }
 
 #status-update-content {
-    width: 50%;
-    height: 25%;
+    width: 75%;
     font-size: 25px;
 }
 
-#status-update-content textarea {
-    width: 100%;
+#status-update-button {
+    margin-top: 4px;
 }
 
 #post-status {
-    width: 100%;
+    display: inline-block;
+    overflow: hidden;
+    height: 1em;
+    width: 74%;
+    margin-top: 4px;
+    font-style: italic;
 }
 
-#status-update-button {
-    float: right;
+.align-right {
+    text-align: right;
 }
 
-#charcount {
-    float: right;
+#status-header-message {
+    display: inline-block;
+    width: 75%;
 }
 
-#charcount.warning {
+#status-charcount {
+    display: inline-block;
+    width: 24%;
+    color: #ccc;
+    text-align: right;
+}
+
+#status-charcount.warning {
     color: red;
 }
 
+#status-update-button-container {
+    display: inline-block;
+    text-align: right;
+    width: 24%;
+}
+
+#tweetlist-separator {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #ccc;
+}
+
 .tweetlist {
-    clear: right;
     overflow-y: auto;
     font-size: 25px;
     height: 75%;
@@ -207,14 +259,14 @@ textarea {
 
 .tweetlist-item {
     padding: 6px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #ccc;
     margin: 6px;
     background-color: white;
     -webkit-transition: background-color 0.3s linear;
 }
 
 .tweetlist-item:hover {
-    background-color: #eeeeee;
+    background-color: #eee;
     -webkit-transition: background-color 0.3s linear;
 }
 

@@ -42,7 +42,7 @@
                     <label for="password">Password</label>
                     <input id="password" type="password" />
                 </p>
-                <input type="submit" id="signin-submit" value="Sign in" />
+                <input type="submit" id="signin-submit" value="Sign in" class="twitter-button-large"/>
                 <span id="signin-error"></span>
             </form>
         </div>
@@ -51,14 +51,19 @@
     <div id="twitter-focus" class="view-container">
         <div id="twitter-focus-content">
             <div id="status-update-content">
-                <span>What's happening?</span>
-                <span id="charcount"></span>
+                <span id="status-header-message">What's happening?</span>
+                <span id="status-charcount"></span>
                 <form>
-                    <textarea cols="40" rows="3" id="status"></textarea>
+                    <label class="textarea-container">
+                        <textarea rows="2" id="status"></textarea>
+                    </label>
                 </form>
                 <span id="post-status"></span>
-                <button id="status-update-button">Tweet it!</button>
+                <span id="status-update-button-container">
+                    <button id="status-update-button" class="twitter-button">Tweet it!</button>
+                </span>
             </div>
+            <div id="tweetlist-separator"></div>
             <div id="twitter-focus-tweetlist" class="tweetlist">
             </div>
         </div>
