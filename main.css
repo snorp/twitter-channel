@@ -217,6 +217,7 @@ textarea:focus {
     width: 74%;
     margin-top: 4px;
     font-style: italic;
+    opacity: 0.0;
 }
 
 .align-right {

@@ -1,5 +1,5 @@
 
-var userPattern = /(@)([a-zA-Z0-9]+)(:? )/g;
+var userPattern = /(@)([a-zA-Z0-9]+)(:?)/g;
 var hashPattern = /(\#)([a-zA-Z0-9]+)/g;
 
 var flickrPattern = /http:\/\/flic\.kr\/p\/([a-zA-Z0-9]+)/g;
@@ -210,8 +210,14 @@ $.extend(TwitterPage.prototype, Page.prototype, {
     },
 
     _setPostStatus: function(text) {
+        if (!text || text.length == 0) {
+            $("#post-status").stop().animate({ 'opacity': '0.0' }, 'slow');
+            return;
+        }
+        
         $("#post-status").html(text);
         $("#post-status").autoFontSize();
+        $("#post-status").stop().animate({ 'opacity': '1.0' }, 'slow');
     },
 
     _postTweet: function() {
@@ -223,7 +229,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             delete this._replyTweet;
         }
 
-        this._setPostStatus("Sending your tweet...");
+        this._setPostStatus("Updating your status...");
 
         var me = this;
         twitter.updateStatus({
