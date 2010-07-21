@@ -86,7 +86,8 @@ SimulatedOpenChannel.prototype = {
         var bottom = this._getOrCreateBorder('openchannel-border-bottom');
         
         right.css({ 'left': width });
-        bottom.css({ 'top': height });
+        bottom.css({ 'top': height,
+                     'width': width });
     },
 
     // only for chrome extension
