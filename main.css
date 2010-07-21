@@ -303,3 +303,7 @@ textarea:focus {
     opacity: 1.0;
     -webkit-transition: opacity 0.3s linear;
 }
+
+.reply-button, .retweet-button {
+    font-size: 18px;
+}

@@ -23,6 +23,10 @@ Page.prototype = {
             me.setView(event.view, event.details);
         }, false);
     },
+    
+    _log: function(message) {
+        console.log(this._tag + ": " + message);
+    },
 
     _getViewElement: function() {
         if (!this._tag) {
@@ -162,14 +166,23 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             me._updateItemCount();
         });
 
+        $("#status").change(function() {
+            me._onStatusChanged();
+        });
+        
         $("#status").keyup(function() {
-            me._updateCharCount();
-            me._shortenUrls();
+            me._onStatusChanged();
         });
 
         $("#status-update-button").click(function() {
             me._postTweet();
         });
+    },
+    
+    _onStatusChanged: function() {
+        this._updateCharCount();
+        this._updateStatusHeader();
+        this._shortenUrls();
     },
 
     setView: function(view, detail) {
@@ -237,7 +250,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
 
             success: function(data) {
                 me._setPostStatus("");
-                $("#status").val("");
+                $("#status").val("").change();
             },
 
             error: function(xhr) {
@@ -310,8 +323,8 @@ $.extend(TwitterPage.prototype, Page.prototype, {
                     </span> \
                     <span class="retweet-message">(retweeted by ${retweetedBy})</span> \
                     <span class="tweet-controls"> \
-                        <a class="reply-button" href="#">reply</a> \
-                        <a class="retweet-button" href="#">retweet</a> \
+                        <a class="reply-button" href="#">Reply</a> \
+                        <a class="retweet-button" href="#">Retweet</a> \
                     </span> \
                 </div> \
             </div>');
@@ -433,8 +446,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             
             $(box).find(".reply-button").click(function(e) {
                 e.preventDefault();
-                $("#status").val("@" + tweet.user.screen_name + " " + $("#status").val());
-                $("#status").focus();
+                $("#status").val("@" + tweet.user.screen_name + " " + $("#status").val()).change().focus();
                 
                 var screenNameLen = tweet.user.screen_name.length + 2;
                 $("#status").get(0).setSelectionRange(screenNameLen, screenNameLen);
@@ -480,6 +492,18 @@ $.extend(TwitterPage.prototype, Page.prototype, {
 
         $("#twitter-focus-tweetlist").find("a").attr('target', '_blank');
     },
+    
+    _updateStatusHeader: function() {
+        var text = $("#status").val();
+        
+        var parts = /^@([a-zA-Z0-9]+)(:?)/.exec(text);
+        var matches = text.match(userPattern);
+        if (parts && parts.length > 1) {
+            $("#status-header-message").text("Reply to " + parts[1]);
+        } else {
+            $("#status-header-message").text("What's happening?");
+        }
+    },
 
     _updateCharCount: function() {
         var charCount = twitter.MAX_CHARS - parseInt($("#status").val().length);
@@ -506,7 +530,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
                 if (shortUrl) {
                     var text = $("#status").val();
                     text = text.replace(url, shortUrl);
-                    $("#status").val(text);
+                    $("#status").val(text).change();
                 }
             });
         }
