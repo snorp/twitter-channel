@@ -38,7 +38,13 @@ SimulatedOpenChannel.prototype = {
             }
 
             me._dispatchEvent(window, "Initialized", {});
-            me.setView(OpenChannel.View.CHANNEL);
+            
+            var lastView = localStorage.getItem("lastView");
+            if (!lastView) {
+                lastView = OpenChannel.View.CHANNEL;
+            }
+            
+            me.setView(lastView);
         }, 1000);
 
         setInterval(function() {
@@ -104,6 +110,8 @@ SimulatedOpenChannel.prototype = {
             width: width,
             height: height
         });
+        
+        localStorage.setItem("lastView", this._view);
     },
 
     _moveNext: function() {

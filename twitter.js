@@ -18,7 +18,7 @@ const RATE_LIMIT_URL = "http://api.twitter.com/1/account/rate_limit_status.json"
 const STATUS_UPDATE_URL = "http://api.twitter.com/1/statuses/update.json";
 const RETWEET_URL = "http://api.twitter.com/1/statuses/retweet/";
 
-const REFRESH_INTERVAL = (1000 * 60 * 15); // 15 minutes
+const REFRESH_INTERVAL = (1000 * 60 * 5); // 5 minutes
 const MAX_TWEETS = 20;
 
 const MAX_DUMP_DEPTH = 10;
@@ -322,6 +322,8 @@ Twitter.prototype = {
                 this[prop] = data[prop];
             }
         }
+        
+        this._stopRefreshTimeout();
     },
 
     _adjustIndex: function(direction) {
@@ -371,7 +373,7 @@ Twitter.prototype = {
 
     _stopRefreshTimeout: function() {
         if (this._refreshTimeoutId) {
-            window.clearInterval(this._refreshTimeoutId);
+            clearInterval(this._refreshTimeoutId);
             delete this._refreshTimeoutId;
         }
     },
@@ -379,7 +381,7 @@ Twitter.prototype = {
     _startRefreshTimeout: function() {
         if (!this._refreshTimeoutId) {
             var me = this;
-            this._refreshTimeoutId = window.setInterval(function() {
+            this._refreshTimeoutId = setInterval(function() {
                 me.refresh();
             }, REFRESH_INTERVAL);
         }
@@ -397,11 +399,9 @@ Twitter.prototype = {
 
     _refreshTweetList: function(url, prop) {
         var parameters = {};
-        /*
         if (this[prop] && this[prop].length > 0) {
             parameters = { 'since_id': this[prop][0].id.toString() };
         }
-        */
         
         console.log("TWITTER: Refreshing " + prop);
 
@@ -420,6 +420,8 @@ Twitter.prototype = {
 
                 me._save();
                 me._mergeTweets();
+                
+                me._startRefreshTimeout();
             },
 
             error: function(xhr, textStatus, errorThrown) {

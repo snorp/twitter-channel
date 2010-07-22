@@ -1,51 +1,48 @@
+const _JQUERY_AUTOFONTSIZE_INCREMENT = 3;
+
 jQuery.fn.autoFontSize = function() {
     this.each(function(i, element) {        
         if ($(element).innerHeight() == 0) {
             // element has not been shown yet!
             return;
         }
+
+        var fontSize = 1;
+
+        var ruler = document.createElement('div');
+        $(ruler).css({
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            margin: 0,
+            padding: 0,
+            visibility: 'hidden',
+            height: 'auto',
+            fontFamily: $(element).css('fontFamily'),
+            fontWeight: $(element).css('fontWeight'),
+            fontStyle: $(element).css('fontStyle'),
+            fontSize: fontSize,
+        });
         
-        if (!$(element).data('defaultFontSize')) {
-            $(element).data('defaultFontSize', $(element).css('font-size'));
-        } else {
-            // reset to default first
-            $(element).css('font-size', $(element).data('defaultFontSize'));
+        $(document.body).append(ruler);
+        
+        // set the ruler width and content to that of the target element
+        $(ruler).width($(element).innerWidth()).html($(element).html());
+
+        //console.time("autofontsize");
+        
+        while ($(ruler).width() < $(element).innerWidth() || $(ruler).height() < $(element).innerHeight()) {
+            fontSize = fontSize + _JQUERY_AUTOFONTSIZE_INCREMENT;
+            $(ruler).css({ fontSize: fontSize });
         }
+        
+        // we overshoot, back it off by one step
+        fontSize = fontSize - _JQUERY_AUTOFONTSIZE_INCREMENT;
+        
+        $(ruler).remove();
 
-        if ($(element).height() > 500) {
-            var fontSize = 125;
-        } else {
-            var fontSize = 75;
-        }
-
-        if ($("#ruler").size() == 0) {
-            $(document.body).append("<div id='ruler'></div>");
-            $("#ruler").css({
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                margin: 0,
-                padding: 0,
-                visibility: 'hidden',
-                height: 'auto'
-            });
-        }
-
-        $("#ruler").width($(element).innerWidth());
-        $("#ruler").html($(element).html());
-
-        var start = new Date().getTime();
-        do {
-            fontSize = fontSize - 1;
-            $("#ruler").css({ fontSize: fontSize });
-        } while ($("#ruler").height() > $(element).innerHeight());
-
-        $("#ruler").remove();
-
-        var end = new Date().getTime();
-
-        //console.log("TWITTER: font sizing took: " + (end - start));
-
+        //console.timeEnd("autofontsize");
+        
         $(element).css({ fontSize: fontSize });
     });
     

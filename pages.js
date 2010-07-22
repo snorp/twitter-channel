@@ -1,5 +1,5 @@
 
-var userPattern = /(@)([a-zA-Z0-9]+)(:?)/g;
+var userPattern = /(@)([a-zA-Z0-9_]+)(:?)/g;
 var hashPattern = /(\#)([a-zA-Z0-9]+)/g;
 
 var flickrPattern = /http:\/\/flic\.kr\/p\/([a-zA-Z0-9]+)/g;
@@ -132,9 +132,7 @@ $.extend(SigninPage.prototype, Page.prototype, {
     },
     
     setView: function(view, detail) {
-        Page.prototype.setView.call(this, view, detail);
-        
-        $(this._getViewElement()).autoFontSize();
+        Page.prototype.setView.call(this, view, detail);        
     }
 });
 
@@ -357,6 +355,10 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             });
             
             $(args.box).find('.tweet-body').css('marginLeft', '62px');
+        }
+        
+        if (!args.showControls) {
+            $(args.box).find('.tweet-controls').hide();
         }
         
         var me = this;
