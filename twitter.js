@@ -103,8 +103,6 @@ Twitter.prototype = {
         OAuth.completeRequest(message, accessor);
         var authorizationHeader = OAuth.getAuthorizationHeader(REALM, message.parameters);
 
-        console.log("TWITTER: starting auth");
-
         var me = this;
         $.ajax({
             type: message.method,
@@ -260,8 +258,6 @@ Twitter.prototype = {
         });
 
         var authorizationHeader = OAuth.getAuthorizationHeader(REALM, message.parameters);
-        console.log("TWITTER: " + authorizationHeader);
-        console.log("TWITTER: requesting: " + message.action);
 
         var me = this;
         $.ajax({
@@ -276,9 +272,6 @@ Twitter.prototype = {
             },
 
             complete: function(xhr, textStatus) {
-                console.log("TWITTER: signed result: " + xhr.status);
-                console.log("TWITTER: signed response: " + xhr.responseText);
-
                 if (xhr.status == 401) {
                     me._notifyAuthInvalid();
                 }
@@ -404,9 +397,13 @@ Twitter.prototype = {
 
     _refreshTweetList: function(url, prop) {
         var parameters = {};
+        /*
         if (this[prop] && this[prop].length > 0) {
             parameters = { 'since_id': this[prop][0].id.toString() };
         }
+        */
+        
+        console.log("TWITTER: Refreshing " + prop);
 
         var me = this;
         this._signedAjax({
