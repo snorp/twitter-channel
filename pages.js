@@ -28,15 +28,17 @@ Page.prototype = {
         console.log(this._tag + ": " + message);
     },
 
-    _getViewElement: function() {
+    _ensureViewElement: function() {
+        this._viewElement = null;
+        
         if (!this._tag) {
             console.log("You must set a tag!");
-            return null;
+            return;
         }
 
         if (!this._view) {
             console.log("No view is set");
-            return null;
+            return;
         }
 
         var id = this._tag + "-" + this._view.toLowerCase();
@@ -45,28 +47,29 @@ Page.prototype = {
             $(document.body).append('<div id="' + id + '" class="view-container"></div>');
         }
 
-        return "#" + id;
+        this._viewElement = $("#" + id).get(0);
     },
 
     setView: function(view, detail) {
-        if (this._view) {
-            $(this._getViewElement()).hide();
+        if (this._viewElement) {
+            $(this._viewElement).hide();
         }
 
         this._view = view;
         this._viewDetail = detail;
 
         if (this._view) {
+            this._ensureViewElement();
 
             if (this._active) {
-                $(this._getViewElement()).show();
+                $(this._viewElement).show();
             }
 
             if (this._width)
-                $(this._getViewElement()).width(this._width);
+                $(this._viewElement).width(this._width);
 
             if (this._height)
-                $(this._getViewElement()).height(this._height);
+                $(this._viewElement).height(this._height);
         }
     },
 
@@ -76,9 +79,9 @@ Page.prototype = {
 
     setActive: function(active) {
         if (active && this._view) {
-            $(this._getViewElement()).show();
+            $(this._viewElement).show();
         } else if (!active && this._view) {
-            $(this._getViewElement()).hide();
+            $(this._viewElement).hide();
         }
 
         this._active = active;
@@ -207,17 +210,6 @@ $.extend(TwitterPage.prototype, Page.prototype, {
         } else {
             openchannel.setItemCount(0);
         }
-    },
-
-    _getTweetbox: function() {
-        var view = this._getViewElement();
-        if ($(view).find(".tweetbox").size() == 0) {
-            var box = document.createElement('div');
-            $(box).addClass('tweetbox');
-            $(view).append(box);
-        }
-
-        return $(view).find(".tweetbox");
     },
 
     _setPostStatus: function(text) {
@@ -386,13 +378,12 @@ $.extend(TwitterPage.prototype, Page.prototype, {
     },
 
     _fadeInCurrentTweet: function() {
-        var view = this._getViewElement();
-
         var tweet = twitter.getCurrentTweet();
         if (!tweet)
            return;
 
-        var box = this._getTweetbox();
+        var box = $(this._viewElement).find('.tweetbox');
+        console.log("got tweetbox? " + box.length);
 
         this._renderTweet({
            box: box,
@@ -539,25 +530,24 @@ $.extend(TwitterPage.prototype, Page.prototype, {
     },
 
     _updateView: function() {
-        var view = this._getViewElement();
-
-        $(view).width(this._width);
-        $(view).height(this._height);
+        $(this._viewElement).width(this._width);
+        $(this._viewElement).height(this._height);
 
         if (this._view == OpenChannel.View.CARD ||
             this._view == OpenChannel.View.CHANNEL) {
+                
 
-            var box = $(view).find('.tweetbox');
-            if (box.size() == 0) {
+            var box = $(this._viewElement).find('.tweetbox');
+            
+            box.children().stop();
+            if (box.children().size() == 0) {
                 this._fadeInCurrentTweet();
                 return;
             }
 
             var me = this;
             box.children().fadeOut('slow', function() {
-                if (view == me._getViewElement()) {
-                    me._fadeInCurrentTweet();
-                }
+                me._fadeInCurrentTweet();
             });
         } else {
             this._updateCharCount();
