@@ -462,7 +462,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             });
             
             $(box).find("a").hover(function() {
-                var longUrl = bitly.getExpandedUrl(this.href);
+                var longUrl = shorturls.getExpandedUrl(this.href);
                 if (longUrl) {
                     this._popupElement = me._popup(this, longUrl);
                 }

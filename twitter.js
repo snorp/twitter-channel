@@ -338,7 +338,7 @@ Twitter.prototype = {
     _expandUrls: function() {
         for (var i = 0; i < this._tweets.length; i++) {
             var urls = findUrls(this._tweets[i].text);
-            bitly.expand(urls);
+            shorturls.fetch(urls);
         }
     },
 
