@@ -304,7 +304,6 @@ $.extend(TwitterPage.prototype, Page.prototype, {
             <div class="tweet-body"> \
                 <div class="tweet-text autofontsize"> \
                     <strong>${screenName}</strong> ${text} \
-                    <div class="tweet-photos"></div> \
                 </div> \
                 <div class="tweet-footer autofontsize"> \
                     <span class="message">${createdAt} via ${source} \
@@ -316,6 +315,7 @@ $.extend(TwitterPage.prototype, Page.prototype, {
                         <a class="reply-button" href="#">Reply</a> \
                         <a class="retweet-button" href="#">Retweet</a> \
                     </span> \
+                    <div class="tweet-photos"></div> \
                 </div> \
             </div>');
 

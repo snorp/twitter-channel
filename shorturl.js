@@ -29,7 +29,8 @@ ShortUrlExpander.prototype = {
     
     fetchOne: function(url, callback) {
         if (this.getExpandedUrl(url)) {
-            callback(this.getExpandedUrl(url));
+            if (callback)
+                callback(this.getExpandedUrl(url));
             return;
         }
         
