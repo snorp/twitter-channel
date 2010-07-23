@@ -2,10 +2,18 @@ const _JQUERY_AUTOFONTSIZE_INCREMENT = 3;
 
 jQuery.fn.autoFontSize = function() {
     this.each(function(i, element) {        
-        if ($(element).innerHeight() == 0) {
+        if ($(element).height() == 0) {
             // element has not been shown yet!
             return;
         }
+        
+        if (!$(element).data('defaultFontSize')) {
+            $(element).data('defaultFontSize', $(element).css('font-size'));
+        } else {
+            // reset to default first
+            $(element).css('font-size', $(element).data('defaultFontSize'));
+        }
+        
 
         var fontSize = 1;
 
@@ -27,18 +35,17 @@ jQuery.fn.autoFontSize = function() {
         $(document.body).append(ruler);
         
         // set the ruler width and content to that of the target element
-        $(ruler).width($(element).innerWidth()).html($(element).html());
+        $(ruler).width($(element).width()).html($(element).html());
 
         //console.time("autofontsize");
-        
-        while ($(ruler).width() < $(element).innerWidth() || $(ruler).height() < $(element).innerHeight()) {
+                
+        while ($(ruler).width() <= $(element).width() && $(ruler).height() < $(element).height()) {
             fontSize = fontSize + _JQUERY_AUTOFONTSIZE_INCREMENT;
             $(ruler).css({ fontSize: fontSize });
         }
         
         // we overshoot, back it off by one step
         fontSize = fontSize - _JQUERY_AUTOFONTSIZE_INCREMENT;
-        
         $(ruler).remove();
 
         //console.timeEnd("autofontsize");

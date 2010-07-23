@@ -135,7 +135,9 @@ $.extend(SigninPage.prototype, Page.prototype, {
     },
     
     setView: function(view, detail) {
-        Page.prototype.setView.call(this, view, detail);        
+        Page.prototype.setView.call(this, view, detail);
+        
+        $(this._viewElement).find('.autofontsize').autoFontSize();      
     }
 });
 
