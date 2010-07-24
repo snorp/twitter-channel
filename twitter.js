@@ -327,12 +327,15 @@ Twitter.prototype = {
     },
 
     _adjustIndex: function(direction) {
+        
         if (!this._tweets || this._tweets.length == 0 ||
             this._index >= this._tweets.length) {
             this._index = 0;
         } else if (this._index < 0) {
             this._index = (this._tweets.length - 1);
         }
+        
+        $(document).trigger('current-tweet-changed');
     },
     
     _expandUrls: function() {
@@ -471,6 +474,10 @@ Twitter.prototype = {
 
     getTweets: function() {
         return this._tweets;
+    },
+    
+    getIndex: function() {
+        return this._index;  
     },
 
     getCurrentTweet: function() {

@@ -88,6 +88,36 @@ textarea:focus {
     -webkit-box-shadow: 3px 3px 3px #666;
 }
 
+#tweetstrip {
+    position: absolute;
+    display: block;
+    bottom: 0;
+    left: 0;
+    height: 176px;
+    opacity: 0.0;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.tweetstrip-item {
+    position: absolute;
+    top: 0;
+    
+    display: inline-block;
+    background-color: white;
+    height: 140px;
+    width: 250px;
+    padding: 8px;
+    margin: 8px;
+    
+    -webkit-border-radius: 8px;
+    -webkit-box-shadow: 3px 3px 3px #666;
+}
+
+.tweetstrip-item.selected {
+    background-color: yellow;
+}
+
 #signin-content {
     position: absolute;
     top: 0;

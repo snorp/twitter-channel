@@ -25,6 +25,7 @@ SimulatedOpenChannel.prototype = {
     _init: function() {
         console.log("initting OpenChannel");
         
+        this._wheelEnabled = false;
         this._itemCount = 0;
         this._loadProperties();
 
@@ -53,14 +54,39 @@ SimulatedOpenChannel.prototype = {
 
         $(document).keydown(function(event) {
             switch (event.which) {
-                case 36:
+                case 36: // home
                     me.setView(OpenChannel.View.FOCUS);
                     break;
-                case 35:
+                case 35: // end
                     me.setView(OpenChannel.View.CHANNEL);
                     break;
-                case 27:
+                case 27: // escape
                     me.setView(OpenChannel.View.CARD);
+                    break;
+                case 46: // delete
+                    if (me._view == OpenChannel.View.CHANNEL) {
+                        me._dispatchEvent(window, "GoButtonPressed");
+                    }
+                    break;
+                case 33: // pgup
+                    if (me._wheelEnabled) {
+                        me._dispatchEvent(window, "WheelPreviousItem");
+                    }
+                    break;
+                case 34: //pgdown
+                    if (me._wheelEnabled) {
+                        me._dispatchEvent(window, "WheelNextItem");
+                    }
+                    break;
+            }
+        });
+        
+        $(document).keyup(function(event) {
+            switch (event.which) {
+                case 46:
+                    if (me._view == OpenChannel.View.CHANNEL) {
+                        me._dispatchEvent(window, "GoButtonReleased");
+                    }
                     break;
             }
         });
@@ -192,11 +218,13 @@ SimulatedOpenChannel.prototype = {
     },
 
     enableWheel: function() {
-
+        this._wheelEnabled = true;
+        this._dispatchEvent(window, "WheelEnabled");
     },
 
     disableWheel: function() {
-
+        this._wheelEnabled = false;
+        this._dispatchEvent(window, "WheelDisabled");
     },
 
     openOptions: function() {
