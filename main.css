@@ -115,7 +115,7 @@ textarea:focus {
 }
 
 .tweetstrip-item.selected {
-    background-color: yellow;
+    background-color: #DCEEF7;
 }
 
 #signin-content {
