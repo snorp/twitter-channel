@@ -9,6 +9,7 @@ TweetStrip.prototype = {
         this._visible = false;
         
         this._box = "#tweetstrip";
+        this.hide();
         
         var me = this;
         $(document).bind('refreshed', function() {
@@ -23,12 +24,12 @@ TweetStrip.prototype = {
         
         window.addEventListener('WheelNextItem', function() {
             twitter.nextTweet();
-            me._updatePosition();
+            me._updatePosition(true);
         }, false);
         
         window.addEventListener('WheelPreviousItem', function() {
             twitter.previousTweet();
-            me._updatePosition();
+            me._updatePosition(true);
         }, false);
     },
     
@@ -39,11 +40,13 @@ TweetStrip.prototype = {
     show: function() {
         console.log("showing tweetstrip");
         this._visible = true;
-        $(this._box).stop().animate({
-            opacity: 1.0,
+        
+        $(this._box).animate({
+            bottom: 0
         });
         
-        this._updatePosition();
+        this._updatePosition(false);
+        
         openchannel.enableWheel();
     },
     
@@ -51,8 +54,8 @@ TweetStrip.prototype = {
         console.log("hiding tweetstrip");
         this._visible = false;
         $(this._box).stop().animate({
-            opacity: 0.0,
-        });
+            bottom: -$(this._box).outerHeight()
+        })
         
         openchannel.disableWheel();
     },
@@ -66,6 +69,9 @@ TweetStrip.prototype = {
             var itemBox = document.createElement('div');
             $(itemBox).attr('id', 'tweetstrip-item-' + tweets[i].id);
             $(itemBox).addClass('tweetstrip-item');
+            
+            $(itemBox).height($(this._box).height());
+            $(itemBox).width($(this._box).height() * 1.90);
             $(this._box).append(itemBox);
             
             $(itemBox).css({
@@ -84,7 +90,7 @@ TweetStrip.prototype = {
         $(this._box).find('.autofontsize').autoFontSize();
     },
     
-    _updatePosition: function() {
+    _updatePosition: function(stopOtherAnimations) {
         $(this._box).find('.selected').removeClass('selected');
         var selected = $(this._box).find('#tweetstrip-item-' + twitter.getCurrentTweet().id);
         selected.addClass('selected');
@@ -104,17 +110,11 @@ TweetStrip.prototype = {
             boxOffset += itemOffset - parseInt($(selected).css('padding-left').replace('px', ''));
         }
         
-        /*
-        if ((boxOffset + visibleWidth) < itemOffset) {
-            boxOffset = itemOffset;
-        } else if ((boxOffset + visibleWidth) > itemOffset) {
-            boxOffset = itemOffset - visibleWidth + itemWidth;
+        if (stopOtherAnimations) {
+            $(this._box).stop();
         }
-        */
-  
-        console.log("Moving box to: " + boxOffset);
         
-        $(this._box).stop().animate({
+        $(this._box).animate({
             opacity: 1.0,
             left: -boxOffset
         });
