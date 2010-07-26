@@ -64,7 +64,6 @@ TweetStrip.prototype = {
         $(this._box).children().remove();
         
         var tweets = twitter.getTweets();
-        var boxWidth = 0;
         for (var i = 0; i < tweets.length; i++) {
             var itemBox = document.createElement('div');
             $(itemBox).attr('id', 'tweetstrip-item-' + tweets[i].id);
@@ -78,7 +77,6 @@ TweetStrip.prototype = {
                 left: i * $(itemBox).outerWidth(true),
             });
             
-            boxWidth = $(itemBox).offset().left + $(itemBox).outerWidth(true);
             
             renderTweet({
                box: itemBox,
@@ -86,7 +84,8 @@ TweetStrip.prototype = {
             });
         }
         
-        $(this._box).width(boxWidth);
+        // sloppy but it works :/
+        $(this._box).width(tweets.length * $(this._box).height() * 2.5);
         $(this._box).find('.autofontsize').autoFontSize();
     },
     
